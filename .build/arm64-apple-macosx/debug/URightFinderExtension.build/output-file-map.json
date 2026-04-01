@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/master.swiftdeps"
+  },
+  "/Users/qingli/Projects/agent_servers/claude-uright/Sources/URightFinderExtension/FinderSyncExtension.swift": {
+    "dependencies": "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/FinderSyncExtension.d",
+    "object": "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/FinderSyncExtension.swift.o",
+    "swiftmodule": "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/FinderSyncExtension~partial.swiftmodule",
+    "swift-dependencies": "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/FinderSyncExtension.swiftdeps",
+    "diagnostics": "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/FinderSyncExtension.dia"
+  }
+}

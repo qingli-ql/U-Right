@@ -1,0 +1,16 @@
+.claude/settings.local.json
+.claude/hooks/*.local.*
+
+# Local secrets and signing material
+.env
+.env.*
+secrets/
+Certificates/
+*.p12
+*.mobileprovision
+
+# Local build and scratch outputs
+build/
+dist/
+tmp/
+.DS_Store

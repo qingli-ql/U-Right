@@ -1,0 +1,3 @@
+module URightShared {
+    header "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightShared.build/include/URightShared-Swift.h"
+}
