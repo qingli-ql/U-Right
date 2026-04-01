@@ -9,7 +9,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let logController = LogWindowController()
     private let onboardingController = OnboardingWindowController()
     private let dispatcher = HostActionDispatcher()
-
     func applicationDidFinishLaunching(_ notification: Notification) {
         buildStatusItem()
         registerNotifications()
@@ -45,7 +44,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func registerNotifications() {
-        DistributedNotificationCenter.default().addObserver(self, selector: #selector(handleActionRequest(_:)), name: URightConstants.handoffNotification, object: nil)
+        DistributedNotificationCenter.default().addObserver(
+            self,
+            selector: #selector(handleActionRequest(_:)),
+            name: URightConstants.handoffNotification,
+            object: nil
+        )
     }
 
     private func installDefaultTemplatesIfNeeded() {
@@ -60,8 +64,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func handleActionRequest(_ notification: Notification) {
-        guard let requestID = notification.object as? String,
-              let request = ActionHandoff.loadRequest(id: requestID) else { return }
+        let requestID = notification.object as? String
+        let userInfo = notification.userInfo
+        Logger.shared.info("host", "Notification received: object=\(requestID ?? "-") hasPayload=\((userInfo?[ActionHandoff.payloadUserInfoKey] as? String) != nil)")
+        guard let requestID,
+              let request = ActionHandoff.loadRequest(id: requestID, userInfo: userInfo) else { return }
         Logger.shared.info("host", "Received action \(request.actionID)")
         dispatcher.perform(request: request)
     }

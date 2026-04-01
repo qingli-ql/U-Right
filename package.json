@@ -1,0 +1,33 @@
+{
+  "name": "uright-electron-host",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron host app for U-Right",
+  "main": "electron/dist/main/main/index.js",
+  "scripts": {
+    "electron:dev": "concurrently -k \"npm:electron:dev:main\" \"npm:electron:dev:renderer\" \"npm:electron:dev:app\"",
+    "electron:dev:main": "tsc -p electron/tsconfig.node.json --watch --preserveWatchOutput",
+    "electron:dev:renderer": "vite --config electron/vite.config.ts --host 127.0.0.1 --port 5187 --strictPort",
+    "electron:dev:app": "wait-on electron/dist/main/main/index.js http-get://127.0.0.1:5187 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5187 electron electron/dist/main/main/index.js",
+    "electron:build": "npm run electron:build:main && npm run electron:build:renderer",
+    "electron:build:main": "tsc -p electron/tsconfig.node.json",
+    "electron:build:renderer": "vite build --config electron/vite.config.ts"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.0.0",
+    "electron": "^37.5.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.5",
+    "wait-on": "^8.0.5"
+  }
+}

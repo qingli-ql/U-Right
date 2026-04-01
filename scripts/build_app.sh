@@ -1,25 +1,76 @@
 #!/bin/zsh
 set -euo pipefail
 
-CONFIG="${1:-debug}"
+CONFIG="${1:-Debug}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BIN_DIR="$(cd "$ROOT" && swift build -c "$CONFIG" --show-bin-path)"
-APP_DIR="$ROOT/build/${CONFIG}/U-Right.app"
-EXT_DIR="$APP_DIR/Contents/PlugIns/URightFinderExtension.appex"
+PROJECT="$ROOT/URight.xcodeproj"
+BUILD_ROOT="$ROOT/build/xcode"
+DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM:-$("$ROOT/scripts/detect_team.sh")}"
+ALLOW_PROVISIONING_UPDATES="${ALLOW_PROVISIONING_UPDATES:-0}"
+FALLBACK_TO_UNSIGNED="${FALLBACK_TO_UNSIGNED:-1}"
+FORCE_LOCAL_SIGN="${FORCE_LOCAL_SIGN:-0}"
+FORCE_UNSIGNED="${FORCE_UNSIGNED:-0}"
 
-rm -rf "$APP_DIR"
-mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources" "$EXT_DIR/Contents/MacOS"
+if [[ ! -d "$PROJECT" ]]; then
+  ruby "$ROOT/scripts/generate_xcodeproj.rb"
+fi
 
-cp "$BIN_DIR/URightHost" "$APP_DIR/Contents/MacOS/URightHost"
-cp "$ROOT/Resources/App/Info.plist" "$APP_DIR/Contents/Info.plist"
+COMMON_ARGS=(
+  -project "$PROJECT" \
+  -scheme "URightHostApp" \
+  -configuration "$CONFIG" \
+  -derivedDataPath "$BUILD_ROOT/DerivedData" \
+  -clonedSourcePackagesDirPath "$BUILD_ROOT/SourcePackages" \
+  SYMROOT="$BUILD_ROOT"
+)
 
-cp "$BIN_DIR/libURightFinderExtensionCore.dylib" "$EXT_DIR/Contents/MacOS/URightFinderExtension"
-cp "$ROOT/Resources/Extension/Info.plist" "$EXT_DIR/Contents/Info.plist"
-chmod +x "$APP_DIR/Contents/MacOS/URightHost" "$EXT_DIR/Contents/MacOS/URightFinderExtension"
+run_unsigned_build() {
+  echo "Building without signing."
+  xcodebuild "${COMMON_ARGS[@]}" CODE_SIGNING_ALLOWED=NO build
+}
 
-codesign --force --sign - "$EXT_DIR/Contents/MacOS/URightFinderExtension"
-codesign --force --sign - --entitlements "$ROOT/Resources/Extension/URightFinderExtension.entitlements" "$EXT_DIR"
-codesign --force --sign - "$APP_DIR/Contents/MacOS/URightHost"
-codesign --force --deep --sign - --entitlements "$ROOT/Resources/App/URightHost.entitlements" "$APP_DIR"
+run_local_signed_build() {
+  echo "Building with local ad-hoc signing (Sign to Run Locally)."
+  xcodebuild "${COMMON_ARGS[@]}" CODE_SIGN_IDENTITY="-" CODE_SIGNING_ALLOWED=YES CODE_SIGNING_REQUIRED=YES build
+}
 
-echo "Built: $APP_DIR"
+if [[ "$FORCE_UNSIGNED" == "1" ]]; then
+  run_unsigned_build
+elif [[ "$FORCE_LOCAL_SIGN" == "1" ]]; then
+  run_local_signed_build
+elif [[ -n "$DEVELOPMENT_TEAM" ]]; then
+  SIGNED_ARGS=(
+    "${COMMON_ARGS[@]}"
+    CODE_SIGN_STYLE=Automatic
+    DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM"
+    CODE_SIGNING_ALLOWED=YES
+    CODE_SIGNING_REQUIRED=YES
+  )
+  if [[ "$ALLOW_PROVISIONING_UPDATES" == "1" ]]; then
+    SIGNED_ARGS+=( -allowProvisioningUpdates )
+  fi
+  echo "Building with development signing for team: $DEVELOPMENT_TEAM"
+  if ! xcodebuild "${SIGNED_ARGS[@]}" build; then
+    echo "Team-signed build failed."
+    if run_local_signed_build; then
+      :
+    elif [[ "$FALLBACK_TO_UNSIGNED" == "1" ]]; then
+      echo "Local signing failed. Falling back to unsigned local build."
+      run_unsigned_build
+    else
+      exit 1
+    fi
+  fi
+else
+  if ! run_local_signed_build; then
+    if [[ "$FALLBACK_TO_UNSIGNED" == "1" ]]; then
+      echo "Local signing failed. Falling back to unsigned local build."
+      run_unsigned_build
+    else
+      exit 1
+    fi
+  fi
+fi
+
+APP_PATH="$BUILD_ROOT/$CONFIG/U-Right.app"
+echo "Built: $APP_PATH"

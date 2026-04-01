@@ -1,75 +1,32 @@
 import Foundation
 
-public struct RuntimeAction: Sendable {
-    public let descriptor: ActionDescriptor
-    public let isVisible: @Sendable (FinderActionContext, AppSettings) -> Bool
-    public let isEnabled: @Sendable (FinderActionContext, AppSettings) -> Bool
-
-    public init(
-        descriptor: ActionDescriptor,
-        isVisible: (@Sendable (FinderActionContext, AppSettings) -> Bool)? = nil,
-        isEnabled: @escaping @Sendable (FinderActionContext, AppSettings) -> Bool = { _, _ in true }
-    ) {
-        self.descriptor = descriptor
-        self.isVisible = isVisible ?? { context, _ in
-            descriptor.supportedContexts.contains(context.selectionKind)
-        }
-        self.isEnabled = isEnabled
-    }
-}
-
 public enum ActionIDs {
     public static let newFile = "create.new-file"
     public static let newFolder = "create.new-folder"
     public static let newFromTemplatePrefix = "create.template."
     public static let openTerminal = "open.terminal"
-    public static let openGhostty = "open.ghostty"
-    public static let openITerm = "open.iterm"
     public static let openVSCode = "open.vscode"
     public static let openCursor = "open.cursor"
     public static let openZed = "open.zed"
     public static let copyPath = "copy.path"
     public static let copyRelativePath = "copy.relative-path"
     public static let revealInFinder = "finder.reveal"
-    public static let getInfo = "finder.info"
-    public static let quickLook = "finder.quicklook"
     public static let duplicate = "file.duplicate"
     public static let rename = "file.rename"
     public static let trash = "file.trash"
     public static let compress = "file.compress"
     public static let showHidden = "view.toggle-hidden"
     public static let refresh = "view.refresh"
-    public static let openContainingFolder = "file.open-containing-folder"
-    public static let openDefault = "file.open-default"
-    public static let editVSCode = "file.edit.vscode"
-    public static let editCursor = "file.edit.cursor"
-    public static let editZed = "file.edit.zed"
-    public static let openTerminalHere = "file.open-terminal-here"
     public static let copyFilename = "copy.filename"
     public static let copyBasename = "copy.basename"
     public static let copyExtension = "copy.extension"
-    public static let lineEndingLF = "file.line-ending.lf"
-    public static let lineEndingCRLF = "file.line-ending.crlf"
-    public static let markdownPreview = "file.markdown-preview"
     public static let jsonFormat = "file.json-format"
     public static let toggleExecutable = "file.toggle-executable"
-    public static let sha256 = "file.sha256"
-    public static let md5 = "file.md5"
-    public static let pasteTerminalPath = "folder.paste-terminal-path"
-    public static let gitStatus = "git.status"
-    public static let gitGUI = "git.gui"
-    public static let searchInFolder = "folder.search"
     public static let countItems = "folder.count"
     public static let folderSize = "folder.size"
-    public static let sessionHidden = "folder.session-hidden"
-    public static let openAllVSCode = "multi.open-all.vscode"
-    public static let openAllCursor = "multi.open-all.cursor"
-    public static let compressSelected = "multi.compress"
-    public static let copyAllPaths = "multi.copy-paths"
+    public static let searchInFolder = "folder.search"
+    public static let gitStatus = "git.status"
     public static let batchRename = "multi.batch-rename"
-    public static let moveAllToTrash = "multi.trash"
-    public static let aiSummarizeSelection = "ai.summarize-selection"
-    public static let aiAskSelection = "ai.ask-selection"
     public static let aiAskClaude = "ai.ask-claude"
     public static let aiAskCodex = "ai.ask-codex"
     public static let aiExplainProject = "ai.explain-project"
@@ -83,167 +40,311 @@ public enum ActionIDs {
     public static let aiJSONSchema = "ai.json-schema"
     public static let aiCommitMessage = "ai.commit-message"
     public static let aiPRSummary = "ai.pr-summary"
+    public static let aiSummarizeSelection = "ai.summarize-selection"
+    public static let aiAskSelection = "ai.ask-selection"
     public static let repeatLastAIAction = "ai.repeat-last"
+}
+
+public enum ActionCatalog {
+    public static let categoryDefinitions: [MenuCategoryDefinition] = [
+        .init(category: .create, title: "Create", systemImageName: "plus.square.on.square", defaultOrder: 0),
+        .init(category: .open, title: "Open", systemImageName: "square.and.arrow.up", defaultOrder: 10),
+        .init(category: .clipboard, title: "Clipboard", systemImageName: "document.on.document", defaultOrder: 20),
+        .init(category: .fileOps, title: "File", systemImageName: "folder", defaultOrder: 30),
+        .init(category: .view, title: "View", systemImageName: "eye", defaultOrder: 40),
+        .init(category: .ai, title: "AI", systemImageName: "sparkles", defaultOrder: 50),
+        .init(category: .git, title: "Git", systemImageName: "point.topleft.down.curvedto.point.bottomright.up", defaultOrder: 60),
+        .init(category: .scripts, title: "Scripts", systemImageName: "terminal", defaultOrder: 70)
+    ]
+
+    public static let defaultVisibleAIActionIDs: [String] = [
+        ActionIDs.aiAskClaude,
+        ActionIDs.aiAskCodex
+    ]
+
+    public static let allDefinitions: [ActionDefinition] = [
+        .init(id: ActionIDs.newFile, title: "New File...", systemImageName: "plus.square.on.square", defaultCategory: .create, supportedContexts: [.folder, .empty], requirements: .init(requiresWritableTarget: true, requiresDirectoryContext: true), defaultOrder: 0),
+        .init(id: ActionIDs.newFolder, title: "New Folder", systemImageName: "folder.badge.plus", defaultCategory: .create, supportedContexts: [.folder, .empty], requirements: .init(requiresWritableTarget: true, requiresDirectoryContext: true), defaultOrder: 10),
+        .init(id: "submenu.templates", title: "New From Template", systemImageName: "doc.badge.plus", defaultCategory: .create, supportedContexts: [.folder, .empty], requirements: .init(requiresWritableTarget: true, requiresDirectoryContext: true), defaultOrder: 20, childrenPolicy: .builtInTemplates),
+        .init(id: ActionIDs.openTerminal, title: "Open in Terminal", systemImageName: "terminal", defaultCategory: .open, supportedContexts: SelectionKind.allCases, requirements: .init(requiredTool: .terminal), defaultOrder: 0),
+        .init(id: ActionIDs.openVSCode, title: "Open in VS Code", systemImageName: "chevron.left.forwardslash.chevron.right", defaultCategory: .open, supportedContexts: SelectionKind.allCases, requirements: .init(requiredTool: .vscode), defaultOrder: 10),
+        .init(id: ActionIDs.openCursor, title: "Open in Cursor", systemImageName: "cursorarrow.rays", defaultCategory: .open, supportedContexts: SelectionKind.allCases, requirements: .init(requiredTool: .cursor), defaultOrder: 20),
+        .init(id: ActionIDs.openZed, title: "Open in Zed", systemImageName: "bolt.badge.a", defaultCategory: .open, supportedContexts: SelectionKind.allCases, requirements: .init(requiredTool: .zed), defaultOrder: 30),
+        .init(id: ActionIDs.copyPath, title: "Copy Path", systemImageName: "document.on.document", defaultCategory: .clipboard, supportedContexts: SelectionKind.allCases, defaultOrder: 0),
+        .init(id: ActionIDs.copyRelativePath, title: "Copy Relative Path", systemImageName: "arrowshape.turn.up.backward.2", defaultCategory: .clipboard, supportedContexts: [.file, .folder, .multi], implementationStatus: .beta, defaultOrder: 10),
+        .init(id: ActionIDs.copyFilename, title: "Copy Filename", systemImageName: "textformat.characters", defaultCategory: .clipboard, supportedContexts: [.file], implementationStatus: .planned, defaultOrder: 20, defaultVisible: false),
+        .init(id: ActionIDs.copyBasename, title: "Copy Basename", systemImageName: "character.textbox", defaultCategory: .clipboard, supportedContexts: [.file], implementationStatus: .planned, defaultOrder: 30, defaultVisible: false),
+        .init(id: ActionIDs.copyExtension, title: "Copy Extension", systemImageName: "tag", defaultCategory: .clipboard, supportedContexts: [.file], implementationStatus: .planned, defaultOrder: 40, defaultVisible: false),
+        .init(id: ActionIDs.revealInFinder, title: "Reveal in Finder", systemImageName: "finder", defaultCategory: .view, supportedContexts: [.file, .folder, .multi], defaultOrder: 0),
+        .init(id: ActionIDs.rename, title: "Rename", systemImageName: "pencil", defaultCategory: .fileOps, supportedContexts: [.file, .folder], requirements: .init(requiresWritableTarget: true, requiresSingleSelection: true, needsConfirmation: true), defaultOrder: 0),
+        .init(id: ActionIDs.trash, title: "Move to Trash", systemImageName: "trash", defaultCategory: .fileOps, supportedContexts: [.file, .folder, .multi], requirements: .init(requiresWritableTarget: true, isDestructive: true, needsConfirmation: true), defaultOrder: 10),
+        .init(id: ActionIDs.duplicate, title: "Duplicate", systemImageName: "plus.square.on.square", defaultCategory: .fileOps, supportedContexts: [.file, .folder, .multi], implementationStatus: .beta, requirements: .init(requiresWritableTarget: true), defaultOrder: 20),
+        .init(id: ActionIDs.compress, title: "Compress", systemImageName: "archivebox", defaultCategory: .fileOps, supportedContexts: [.file, .folder, .multi], implementationStatus: .beta, requirements: .init(requiresWritableTarget: true), defaultOrder: 30),
+        .init(id: ActionIDs.jsonFormat, title: "JSON Format", systemImageName: "curlybraces", defaultCategory: .fileOps, supportedContexts: [.file], implementationStatus: .beta, requirements: .init(requiresWritableTarget: true, requiresSingleSelection: true, needsConfirmation: true), defaultOrder: 40),
+        .init(id: ActionIDs.toggleExecutable, title: "Toggle Executable Bit", systemImageName: "switch.2", defaultCategory: .fileOps, supportedContexts: [.file], implementationStatus: .beta, requirements: .init(requiresWritableTarget: true, requiresSingleSelection: true, needsConfirmation: true), defaultOrder: 50),
+        .init(id: ActionIDs.gitStatus, title: "Open Git Status Here", systemImageName: "point.topleft.down.curvedto.point.bottomright.up", defaultCategory: .git, supportedContexts: [.folder, .empty], implementationStatus: .beta, defaultOrder: 0),
+        .init(id: ActionIDs.aiAskClaude, title: "Ask Claude About This", systemImageName: "sparkles", defaultCategory: .ai, supportedContexts: SelectionKind.allCases, requirements: .init(requiresAI: true), defaultOrder: 0),
+        .init(id: ActionIDs.aiAskCodex, title: "Ask Codex About This", systemImageName: "brain", defaultCategory: .ai, supportedContexts: SelectionKind.allCases, requirements: .init(requiresAI: true), defaultOrder: 10),
+        .init(id: ActionIDs.aiExplainProject, title: "Explain This Project", systemImageName: "folder.badge.questionmark", defaultCategory: .ai, supportedContexts: [.folder, .empty, .multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 20, defaultVisible: false),
+        .init(id: ActionIDs.aiSummarizeFiles, title: "Summarize Files", systemImageName: "doc.text.magnifyingglass", defaultCategory: .ai, supportedContexts: SelectionKind.allCases, implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 30, defaultVisible: false),
+        .init(id: ActionIDs.aiGenerateReadme, title: "Generate README", systemImageName: "book.pages", defaultCategory: .ai, supportedContexts: [.folder, .empty, .multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 40, defaultVisible: false),
+        .init(id: ActionIDs.aiGenerateGitignore, title: "Generate .gitignore", systemImageName: "nosign", defaultCategory: .ai, supportedContexts: [.folder, .empty], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 50, defaultVisible: false),
+        .init(id: ActionIDs.aiReviewCode, title: "Review Code", systemImageName: "checkmark.seal.text.page", defaultCategory: .ai, supportedContexts: [.file, .folder, .multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 60, defaultVisible: false),
+        .init(id: ActionIDs.aiRefactorFile, title: "Refactor This File", systemImageName: "wand.and.stars", defaultCategory: .ai, supportedContexts: [.file], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 70, defaultVisible: false),
+        .init(id: ActionIDs.aiWriteTests, title: "Write Tests For This", systemImageName: "testtube.2", defaultCategory: .ai, supportedContexts: [.file, .folder], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 80, defaultVisible: false),
+        .init(id: ActionIDs.aiExplainError, title: "Explain Error Log", systemImageName: "exclamationmark.bubble", defaultCategory: .ai, supportedContexts: [.file], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 90, defaultVisible: false),
+        .init(id: ActionIDs.aiJSONSchema, title: "Convert to JSON Schema", systemImageName: "curlybraces.square", defaultCategory: .ai, supportedContexts: [.file], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 100, defaultVisible: false),
+        .init(id: ActionIDs.aiCommitMessage, title: "Draft Commit Message", systemImageName: "text.redaction", defaultCategory: .ai, supportedContexts: [.folder, .empty, .multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 110, defaultVisible: false),
+        .init(id: ActionIDs.aiPRSummary, title: "Draft PR Summary", systemImageName: "rectangle.and.pencil.and.ellipsis", defaultCategory: .ai, supportedContexts: [.folder, .empty, .multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 120, defaultVisible: false),
+        .init(id: ActionIDs.aiSummarizeSelection, title: "AI Summarize Selection", systemImageName: "sparkles.rectangle.stack", defaultCategory: .ai, supportedContexts: [.multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 130, defaultVisible: false),
+        .init(id: ActionIDs.aiAskSelection, title: "AI Ask About Selection", systemImageName: "questionmark.bubble", defaultCategory: .ai, supportedContexts: [.multi], implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 140, defaultVisible: false),
+        .init(id: ActionIDs.repeatLastAIAction, title: "Repeat Last AI Action", systemImageName: "arrow.clockwise.circle", defaultCategory: .ai, supportedContexts: SelectionKind.allCases, implementationStatus: .planned, requirements: .init(requiresAI: true), defaultOrder: 150, defaultVisible: false),
+        .init(id: "submenu.scripts", title: "Scripts", systemImageName: "terminal", defaultCategory: .scripts, supportedContexts: SelectionKind.allCases, implementationStatus: .beta, defaultOrder: 0, defaultVisible: true, childrenPolicy: .scripts),
+        .init(id: ActionIDs.showHidden, title: "Show Hidden Files Here", systemImageName: "eye.slash", defaultCategory: .view, supportedContexts: [.folder, .empty], implementationStatus: .planned, defaultOrder: 10, defaultVisible: false),
+        .init(id: ActionIDs.refresh, title: "Refresh Finder Window", systemImageName: "arrow.clockwise", defaultCategory: .view, supportedContexts: SelectionKind.allCases, implementationStatus: .planned, defaultOrder: 20, defaultVisible: false),
+        .init(id: ActionIDs.searchInFolder, title: "Search in Folder", systemImageName: "magnifyingglass", defaultCategory: .view, supportedContexts: [.folder, .empty], implementationStatus: .planned, defaultOrder: 30, defaultVisible: false),
+        .init(id: ActionIDs.folderSize, title: "Folder Size", systemImageName: "internaldrive", defaultCategory: .view, supportedContexts: [.folder, .empty], implementationStatus: .planned, defaultOrder: 40, defaultVisible: false),
+        .init(id: ActionIDs.countItems, title: "Count Items", systemImageName: "number", defaultCategory: .view, supportedContexts: [.folder, .empty], implementationStatus: .planned, defaultOrder: 50, defaultVisible: false),
+        .init(id: ActionIDs.batchRename, title: "Batch Rename", systemImageName: "character.cursor.ibeam", defaultCategory: .fileOps, supportedContexts: [.multi], implementationStatus: .planned, defaultOrder: 60, defaultVisible: false)
+    ]
+
+    public static func definition(for id: String) -> ActionDefinition? {
+        allDefinitions.first { $0.id == id }
+    }
+}
+
+public enum ActionAvailabilityEvaluator {
+    public static func evaluate(definition: ActionDefinition, context: FinderActionContext, settings: AppSettings) -> ActionAvailability {
+        guard definition.implementationStatus == .implemented || definition.implementationStatus == .beta else {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "未实现")
+        }
+        guard definition.supportedContexts.contains(context.selectionKind) else {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "当前上下文不支持")
+        }
+        guard actionSetting(for: definition.id, settings: settings)?.isEnabled ?? definition.defaultVisible else {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "已在设置中隐藏")
+        }
+        let category = resolvedCategory(for: definition, settings: settings)
+        guard categorySetting(for: category, settings: settings)?.isEnabled ?? true else {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "分类已隐藏")
+        }
+        if definition.requirements.requiresSingleSelection, context.selectedURLs.count > 1 {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "仅支持单个目标")
+        }
+        if definition.requirements.requiresDirectoryContext, context.workingDirectoryURL == nil {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "缺少目录上下文")
+        }
+        if definition.requirements.requiresWritableTarget, !hasWritableTarget(context: context) {
+            return .init(isVisible: false, isEnabled: false, disabledReason: "目标不可写")
+        }
+        if definition.requirements.requiresAI {
+            if !settings.aiEnabled {
+                return .init(isVisible: false, isEnabled: false, disabledReason: "AI 已禁用")
+            }
+            if !settings.aiActionVisibility.contains(definition.id) {
+                return .init(isVisible: false, isEnabled: false, disabledReason: "AI 动作未启用")
+            }
+            if !hasAvailableAIBackend(context: context, settings: settings, definition: definition) {
+                return .init(isVisible: settings.contextMenu.showUnavailableInPreview, isEnabled: false, disabledReason: "未检测到可用 AI")
+            }
+        }
+        if let requiredTool = definition.requirements.requiredTool {
+            let toolPreference = settings.toolPreferences.first { $0.kind == requiredTool }
+            guard toolPreference?.allowMenuActions ?? true else {
+                return .init(isVisible: false, isEnabled: false, disabledReason: "工具动作已禁用")
+            }
+            guard context.detectedTools[requiredTool]?.isInstalled == true else {
+                return .init(isVisible: settings.contextMenu.showUnavailableInPreview, isEnabled: false, disabledReason: "未检测到 \(requiredTool.rawValue)")
+            }
+        }
+        return .init(isVisible: true, isEnabled: true, disabledReason: nil)
+    }
+
+    public static func resolvedCategory(for definition: ActionDefinition, settings: AppSettings) -> ActionCategory {
+        actionSetting(for: definition.id, settings: settings)?.categoryOverride ?? definition.defaultCategory
+    }
+
+    public static func resolvedOrder(for definition: ActionDefinition, settings: AppSettings) -> Int {
+        actionSetting(for: definition.id, settings: settings)?.orderOverride ?? definition.defaultOrder
+    }
+
+    public static func categorySetting(for category: ActionCategory, settings: AppSettings) -> MenuCategorySettings? {
+        settings.contextMenu.categorySettings.first { $0.category == category }
+    }
+
+    public static func actionSetting(for actionID: String, settings: AppSettings) -> MenuActionSettings? {
+        settings.contextMenu.actionSettings.first { $0.actionID == actionID }
+    }
+
+    private static func hasWritableTarget(context: FinderActionContext) -> Bool {
+        let target = context.selectedURLs.first ?? context.workingDirectoryURL
+        guard let target else { return false }
+        if !FileManager.default.fileExists(atPath: target.path) {
+            return FileManager.default.isWritableFile(atPath: target.deletingLastPathComponent().path)
+        }
+        return FileManager.default.isWritableFile(atPath: target.path)
+    }
+
+    private static func hasAvailableAIBackend(context: FinderActionContext, settings: AppSettings, definition: ActionDefinition) -> Bool {
+        if definition.id == ActionIDs.aiAskClaude {
+            return context.detectedTools[.claude]?.isInstalled == true || !settings.apiKey.isEmpty
+        }
+        if definition.id == ActionIDs.aiAskCodex {
+            return context.detectedTools[.codex]?.isInstalled == true || !settings.apiKey.isEmpty
+        }
+        return context.detectedTools[.claude]?.isInstalled == true
+            || context.detectedTools[.codex]?.isInstalled == true
+            || !settings.apiKey.isEmpty
+    }
+}
+
+public enum ActionMenuBuilder {
+    public static func build(context: FinderActionContext, settings: AppSettings, includeUnavailable: Bool = false) -> [ActionDescriptor] {
+        let categories = ActionCatalog.categoryDefinitions.sorted { lhs, rhs in
+            let left = ActionAvailabilityEvaluator.categorySetting(for: lhs.category, settings: settings)?.order ?? lhs.defaultOrder
+            let right = ActionAvailabilityEvaluator.categorySetting(for: rhs.category, settings: settings)?.order ?? rhs.defaultOrder
+            return left < right
+        }
+
+        var output: [ActionDescriptor] = []
+
+        for category in categories {
+            guard ActionAvailabilityEvaluator.categorySetting(for: category.category, settings: settings)?.isEnabled ?? true else {
+                continue
+            }
+            let displayStyle = ActionAvailabilityEvaluator.categorySetting(for: category.category, settings: settings)?.displayStyle ?? category.defaultDisplayStyle
+            let actions = actions(for: category.category, context: context, settings: settings, includeUnavailable: includeUnavailable)
+            guard !actions.isEmpty else { continue }
+
+            if displayStyle == .inline || (settings.contextMenu.collapseSingleActionGroups && actions.count == 1) {
+                output.append(contentsOf: actions)
+            } else {
+                output.append(
+                    ActionDescriptor(
+                        id: "category.\(category.category.rawValue)",
+                        title: category.title,
+                        systemImageName: category.systemImageName,
+                        category: category.category,
+                        supportedContexts: SelectionKind.allCases,
+                        children: actions,
+                        isEnabled: true
+                    )
+                )
+            }
+        }
+
+        return output
+    }
+
+    public static func previewLines(context: FinderActionContext, settings: AppSettings) -> [String] {
+        build(context: context, settings: settings, includeUnavailable: settings.contextMenu.showUnavailableInPreview).flatMap { descriptor in
+            previewLines(for: descriptor)
+        }
+    }
+
+    private static func previewLines(for descriptor: ActionDescriptor, level: Int = 0) -> [String] {
+        let prefix = String(repeating: "  ", count: level)
+        let label = descriptor.statusBadge.map { "\(descriptor.title) [\($0)]" } ?? descriptor.title
+        if descriptor.children.isEmpty {
+            return ["\(prefix)- \(label)"]
+        }
+        return ["\(prefix)- \(label)"] + descriptor.children.flatMap { previewLines(for: $0, level: level + 1) }
+    }
+
+    private static func actions(for category: ActionCategory, context: FinderActionContext, settings: AppSettings, includeUnavailable: Bool) -> [ActionDescriptor] {
+        let definitions = ActionCatalog.allDefinitions
+            .filter { ActionAvailabilityEvaluator.resolvedCategory(for: $0, settings: settings) == category }
+            .sorted { ActionAvailabilityEvaluator.resolvedOrder(for: $0, settings: settings) < ActionAvailabilityEvaluator.resolvedOrder(for: $1, settings: settings) }
+
+        return definitions.compactMap { definition in
+            let availability = ActionAvailabilityEvaluator.evaluate(definition: definition, context: context, settings: settings)
+            guard availability.isVisible || includeUnavailable else { return nil }
+            return descriptor(for: definition, context: context, settings: settings, availability: availability, includeUnavailable: includeUnavailable)
+        }
+    }
+
+    private static func descriptor(
+        for definition: ActionDefinition,
+        context: FinderActionContext,
+        settings: AppSettings,
+        availability: ActionAvailability,
+        includeUnavailable: Bool
+    ) -> ActionDescriptor? {
+        let children: [ActionDescriptor]
+        switch definition.childrenPolicy {
+        case .none:
+            children = []
+        case .builtInTemplates:
+            children = templateChildren(context: context, settings: settings, includeUnavailable: includeUnavailable)
+        case .scripts:
+            children = scriptChildren(context: context, settings: settings, includeUnavailable: includeUnavailable)
+        }
+        if definition.childrenPolicy != .none && children.isEmpty {
+            return nil
+        }
+        let badge = availability.isEnabled ? nil : availability.disabledReason
+        return ActionDescriptor(
+            id: definition.id,
+            title: definition.title,
+            systemImageName: definition.systemImageName,
+            category: ActionAvailabilityEvaluator.resolvedCategory(for: definition, settings: settings),
+            supportedContexts: definition.supportedContexts,
+            executionMode: definition.executionMode,
+            children: children,
+            statusBadge: badge,
+            isEnabled: availability.isEnabled
+        )
+    }
+
+    private static func templateChildren(context: FinderActionContext, settings: AppSettings, includeUnavailable: Bool) -> [ActionDescriptor] {
+        let definitions = BuiltInTemplates.all.map { template in
+            ActionDefinition(
+                id: ActionIDs.newFromTemplatePrefix + template.id,
+                title: template.title,
+                systemImageName: "doc.badge.plus",
+                defaultCategory: .create,
+                supportedContexts: [.folder, .empty],
+                implementationStatus: .implemented,
+                requirements: .init(requiresWritableTarget: true, requiresDirectoryContext: true),
+                defaultOrder: 1000
+            )
+        }
+        return definitions.compactMap { definition in
+            let availability = ActionAvailabilityEvaluator.evaluate(definition: definition, context: context, settings: settings)
+            guard availability.isVisible || includeUnavailable else { return nil }
+            return ActionDescriptor(
+                id: definition.id,
+                title: definition.title,
+                systemImageName: definition.systemImageName,
+                category: .create,
+                supportedContexts: definition.supportedContexts,
+                statusBadge: availability.isEnabled ? nil : availability.disabledReason,
+                isEnabled: availability.isEnabled
+            )
+        }
+    }
+
+    private static func scriptChildren(context: FinderActionContext, settings: AppSettings, includeUnavailable: Bool) -> [ActionDescriptor] {
+        let urls = (try? FileManager.default.contentsOfDirectory(at: SharedPaths.scriptsDirectory(), includingPropertiesForKeys: nil)) ?? []
+        return urls
+            .filter { $0.pathExtension != "" || FileManager.default.isExecutableFile(atPath: $0.path) }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+            .map {
+                ActionDescriptor(
+                    id: "script.run.\($0.lastPathComponent)",
+                    title: $0.deletingPathExtension().lastPathComponent,
+                    systemImageName: "terminal",
+                    category: .scripts,
+                    supportedContexts: SelectionKind.allCases,
+                    statusBadge: includeUnavailable && context.workingDirectoryURL == nil ? "缺少工作目录" : nil,
+                    isEnabled: context.workingDirectoryURL != nil
+                )
+            }
+    }
 }
 
 public enum ActionRegistry {
     public static func topLevelActions(context: FinderActionContext, settings: AppSettings) -> [ActionDescriptor] {
-        let tools = context.detectedTools
-        let base: [RuntimeAction] = [
-            .init(descriptor: .init(id: ActionIDs.newFile, title: "New File...", systemImageName: "plus.square.on.square", category: .create, supportedContexts: [.folder, .empty])),
-            .init(descriptor: .init(id: ActionIDs.newFolder, title: "New Folder", systemImageName: "folder.badge.plus", category: .create, supportedContexts: [.folder, .empty])),
-            .init(descriptor: .init(id: ActionIDs.openTerminal, title: "Open in Terminal", systemImageName: "terminal", category: .open, supportedContexts: SelectionKind.allCases)),
-            .init(descriptor: .init(id: ActionIDs.openGhostty, title: "Open in Ghostty", systemImageName: "bolt.horizontal.circle", category: .open, supportedContexts: SelectionKind.allCases, statusBadge: tools[.ghostty]?.isInstalled == true ? "✓" : nil), isEnabled: { _, _ in tools[.ghostty]?.isInstalled == true }),
-            .init(descriptor: .init(id: ActionIDs.openITerm, title: "Open in iTerm", systemImageName: "greaterthan.circle", category: .open, supportedContexts: SelectionKind.allCases, statusBadge: tools[.iTerm]?.isInstalled == true ? "✓" : nil), isEnabled: { _, _ in tools[.iTerm]?.isInstalled == true }),
-            .init(descriptor: .init(id: ActionIDs.openVSCode, title: "Open in VS Code", systemImageName: "chevron.left.forwardslash.chevron.right", category: .open, supportedContexts: SelectionKind.allCases, statusBadge: tools[.vscode]?.isInstalled == true ? "✓" : nil), isEnabled: { _, _ in tools[.vscode]?.isInstalled == true }),
-            .init(descriptor: .init(id: ActionIDs.openCursor, title: "Open in Cursor", systemImageName: "cursorarrow.rays", category: .open, supportedContexts: SelectionKind.allCases, statusBadge: tools[.cursor]?.isInstalled == true ? "✓" : nil), isEnabled: { _, _ in tools[.cursor]?.isInstalled == true }),
-            .init(descriptor: .init(id: ActionIDs.openZed, title: "Open in Zed", systemImageName: "bolt.badge.a", category: .open, supportedContexts: SelectionKind.allCases, statusBadge: tools[.zed]?.isInstalled == true ? "✓" : nil), isEnabled: { _, _ in tools[.zed]?.isInstalled == true }),
-            .init(descriptor: .init(id: ActionIDs.copyPath, title: "Copy Path", systemImageName: "document.on.document", category: .clipboard, supportedContexts: SelectionKind.allCases)),
-            .init(descriptor: .init(id: ActionIDs.copyRelativePath, title: "Copy Relative Path", systemImageName: "arrowshape.turn.up.backward.2", category: .clipboard, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.revealInFinder, title: "Reveal in Finder", systemImageName: "finder", category: .view, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.getInfo, title: "Get Info", systemImageName: "info.circle", category: .view, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.quickLook, title: "Quick Look", systemImageName: "eye", category: .view, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.duplicate, title: "Duplicate", systemImageName: "plus.square.on.square", category: .fileOps, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.rename, title: "Rename", systemImageName: "pencil", category: .fileOps, supportedContexts: [.file, .folder])),
-            .init(descriptor: .init(id: ActionIDs.trash, title: "Move to Trash", systemImageName: "trash", category: .fileOps, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.compress, title: "Compress", systemImageName: "archivebox", category: .fileOps, supportedContexts: [.file, .folder, .multi])),
-            .init(descriptor: .init(id: ActionIDs.showHidden, title: "Show Hidden Files Here", systemImageName: "eye.slash", category: .view, supportedContexts: [.folder, .empty])),
-            .init(descriptor: .init(id: ActionIDs.refresh, title: "Refresh Finder Window", systemImageName: "arrow.clockwise", category: .view, supportedContexts: SelectionKind.allCases))
-        ]
-
-        let fileSpecific: [ActionDescriptor] = [
-            .init(id: ActionIDs.openContainingFolder, title: "Open Containing Folder", systemImageName: "folder", category: .open, supportedContexts: [.file]),
-            .init(id: ActionIDs.openDefault, title: "Open With Default App", systemImageName: "play.circle", category: .open, supportedContexts: [.file]),
-            .init(id: ActionIDs.editVSCode, title: "Edit in VS Code", systemImageName: "chevron.left.forwardslash.chevron.right", category: .open, supportedContexts: [.file]),
-            .init(id: ActionIDs.editCursor, title: "Edit in Cursor", systemImageName: "cursorarrow.rays", category: .open, supportedContexts: [.file]),
-            .init(id: ActionIDs.editZed, title: "Edit in Zed", systemImageName: "bolt.badge.a", category: .open, supportedContexts: [.file]),
-            .init(id: ActionIDs.openTerminalHere, title: "Open in Terminal Here", systemImageName: "terminal", category: .open, supportedContexts: [.file]),
-            .init(id: ActionIDs.copyFilename, title: "Copy Filename", systemImageName: "doc.on.doc", category: .clipboard, supportedContexts: [.file]),
-            .init(id: ActionIDs.copyBasename, title: "Copy Basename", systemImageName: "text.cursor", category: .clipboard, supportedContexts: [.file]),
-            .init(id: ActionIDs.copyExtension, title: "Copy Extension", systemImageName: "tag", category: .clipboard, supportedContexts: [.file]),
-            .init(id: "file.line-ending", title: "Convert Line Endings", systemImageName: "arrow.left.arrow.right", category: .fileOps, supportedContexts: [.file], children: [
-                .init(id: ActionIDs.lineEndingLF, title: "LF", systemImageName: "arrow.down.to.line", category: .fileOps, supportedContexts: [.file]),
-                .init(id: ActionIDs.lineEndingCRLF, title: "CRLF", systemImageName: "arrow.up.and.down.text.horizontal", category: .fileOps, supportedContexts: [.file])
-            ]),
-            .init(id: ActionIDs.markdownPreview, title: "Markdown Preview", systemImageName: "doc.richtext", category: .view, supportedContexts: [.file]),
-            .init(id: ActionIDs.jsonFormat, title: "JSON Format", systemImageName: "curlybraces", category: .fileOps, supportedContexts: [.file]),
-            .init(id: ActionIDs.toggleExecutable, title: "Toggle Executable Bit", systemImageName: "gearshape.2", category: .fileOps, supportedContexts: [.file]),
-            .init(id: ActionIDs.sha256, title: "Calculate SHA256", systemImageName: "number", category: .advanced, supportedContexts: [.file]),
-            .init(id: ActionIDs.md5, title: "Calculate MD5", systemImageName: "number.circle", category: .advanced, supportedContexts: [.file])
-        ]
-
-        let folderSpecific: [ActionDescriptor] = [
-            .init(id: "folder.new-text", title: "New Text File", systemImageName: "doc.text", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: "folder.new-markdown", title: "New Markdown File", systemImageName: "doc.richtext", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: "folder.new-json", title: "New JSON File", systemImageName: "curlybraces", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: "folder.new-python", title: "New Python File", systemImageName: "chevron.left.forwardslash.chevron.right", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: "folder.new-shell", title: "New Shell Script", systemImageName: "terminal", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: "folder.new-gitignore", title: "New .gitignore", systemImageName: "nosign", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: "folder.new-readme", title: "New README.md", systemImageName: "book", category: .create, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.pasteTerminalPath, title: "Paste Terminal Path", systemImageName: "terminal", category: .clipboard, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.gitStatus, title: "Open Git Status Here", systemImageName: "point.topleft.down.curvedto.point.bottomright.up", category: .git, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.gitGUI, title: "Open Git GUI Here", systemImageName: "square.stack.3d.up", category: .git, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.searchInFolder, title: "Search in Folder", systemImageName: "magnifyingglass", category: .advanced, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.countItems, title: "Count Items", systemImageName: "number.square", category: .advanced, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.folderSize, title: "Folder Size", systemImageName: "externaldrive.badge.timemachine", category: .advanced, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.sessionHidden, title: "Toggle Hidden Files for This Folder Session", systemImageName: "eye.trianglebadge.exclamationmark", category: .view, supportedContexts: [.folder, .empty])
-        ]
-
-        let multiSpecific: [ActionDescriptor] = [
-            .init(id: ActionIDs.openAllVSCode, title: "Open All in VS Code", systemImageName: "chevron.left.forwardslash.chevron.right", category: .open, supportedContexts: [.multi]),
-            .init(id: ActionIDs.openAllCursor, title: "Open All in Cursor", systemImageName: "cursorarrow.rays", category: .open, supportedContexts: [.multi]),
-            .init(id: ActionIDs.compressSelected, title: "Compress Selected", systemImageName: "archivebox", category: .fileOps, supportedContexts: [.multi]),
-            .init(id: ActionIDs.copyAllPaths, title: "Copy All Paths", systemImageName: "list.bullet.rectangle", category: .clipboard, supportedContexts: [.multi]),
-            .init(id: ActionIDs.batchRename, title: "Batch Rename...", systemImageName: "character.cursor.ibeam", category: .fileOps, supportedContexts: [.multi]),
-            .init(id: ActionIDs.moveAllToTrash, title: "Move All to Trash", systemImageName: "trash", category: .fileOps, supportedContexts: [.multi]),
-            .init(id: ActionIDs.aiSummarizeSelection, title: "AI Summarize Selection", systemImageName: "sparkles.rectangle.stack", category: .ai, supportedContexts: [.multi]),
-            .init(id: ActionIDs.aiAskSelection, title: "AI Ask About Selection", systemImageName: "questionmark.bubble", category: .ai, supportedContexts: [.multi])
-        ]
-
-        let aiChildren: [ActionDescriptor] = [
-            .init(id: ActionIDs.aiAskClaude, title: "Ask Claude About This", systemImageName: "sparkles", category: .ai, supportedContexts: SelectionKind.allCases, statusBadge: tools[.claude]?.isInstalled == true ? "CLI" : nil),
-            .init(id: ActionIDs.aiAskCodex, title: "Ask Codex About This", systemImageName: "brain", category: .ai, supportedContexts: SelectionKind.allCases, statusBadge: tools[.codex]?.isInstalled == true ? "CLI" : nil),
-            .init(id: ActionIDs.aiExplainProject, title: "Explain This Project", systemImageName: "folder.badge.questionmark", category: .ai, supportedContexts: [.folder, .empty, .multi]),
-            .init(id: ActionIDs.aiSummarizeFiles, title: "Summarize Files", systemImageName: "doc.text.magnifyingglass", category: .ai, supportedContexts: SelectionKind.allCases),
-            .init(id: ActionIDs.aiGenerateReadme, title: "Generate README", systemImageName: "book.pages", category: .ai, supportedContexts: [.folder, .empty, .multi]),
-            .init(id: ActionIDs.aiGenerateGitignore, title: "Generate .gitignore", systemImageName: "nosign", category: .ai, supportedContexts: [.folder, .empty]),
-            .init(id: ActionIDs.aiReviewCode, title: "Review Code", systemImageName: "checkmark.seal.text.page", category: .ai, supportedContexts: [.file, .folder, .multi]),
-            .init(id: ActionIDs.aiRefactorFile, title: "Refactor This File", systemImageName: "wand.and.stars", category: .ai, supportedContexts: [.file]),
-            .init(id: ActionIDs.aiWriteTests, title: "Write Tests For This", systemImageName: "testtube.2", category: .ai, supportedContexts: [.file, .folder]),
-            .init(id: ActionIDs.aiExplainError, title: "Explain Error Log", systemImageName: "exclamationmark.bubble", category: .ai, supportedContexts: [.file]),
-            .init(id: ActionIDs.aiJSONSchema, title: "Convert to JSON Schema", systemImageName: "curlybraces.square", category: .ai, supportedContexts: [.file]),
-            .init(id: ActionIDs.aiCommitMessage, title: "Draft Commit Message", systemImageName: "text.redaction", category: .ai, supportedContexts: [.folder, .empty, .multi]),
-            .init(id: ActionIDs.aiPRSummary, title: "Draft PR Summary", systemImageName: "rectangle.and.pencil.and.ellipsis", category: .ai, supportedContexts: [.folder, .empty, .multi]),
-            .init(id: ActionIDs.repeatLastAIAction, title: "Repeat Last AI Action", systemImageName: "arrow.clockwise.circle", category: .ai, supportedContexts: SelectionKind.allCases)
-        ]
-
-        let templateChildren = BuiltInTemplates.all.map {
-            ActionDescriptor(id: ActionIDs.newFromTemplatePrefix + $0.id, title: $0.title, systemImageName: "doc.badge.plus", category: .templates, supportedContexts: [.folder, .empty])
-        }
-
-        let scriptsChildren = discoverScriptDescriptors()
-
-        var descriptors = base.filter { $0.isVisible(context, settings) }.map(\.descriptor)
-        descriptors.append(.init(id: "submenu.ai", title: "AI Actions", systemImageName: "sparkles", category: .ai, supportedContexts: SelectionKind.allCases, children: aiChildren))
-        descriptors.append(.init(id: "submenu.open-with", title: "Open With", systemImageName: "square.and.arrow.up", category: .open, supportedContexts: SelectionKind.allCases, children: openWithDescriptors(for: context)))
-        descriptors.append(.init(id: "submenu.templates", title: "New From Template", systemImageName: "doc.badge.plus", category: .templates, supportedContexts: [.folder, .empty], children: templateChildren))
-        descriptors.append(.init(id: "submenu.scripts", title: "Scripts", systemImageName: "terminal.fill", category: .scripts, supportedContexts: SelectionKind.allCases, children: scriptsChildren))
-
-        if context.selectionKind == .file {
-            descriptors.append(contentsOf: fileSpecific)
-        }
-        if context.selectionKind == .folder || context.selectionKind == .empty {
-            descriptors.append(contentsOf: folderSpecific)
-        }
-        if context.selectionKind == .multi {
-            descriptors.append(contentsOf: multiSpecific)
-        }
-
-        return descriptors.filter { $0.supportedContexts.contains(context.selectionKind) }
-    }
-
-    private static func openWithDescriptors(for context: FinderActionContext) -> [ActionDescriptor] {
-        let installed = context.detectedTools.filter { $0.value.isInstalled }.keys
-        return [ToolKind.vscode, .cursor, .zed, .terminal, .ghostty, .iTerm].compactMap { kind in
-            guard installed.contains(kind) else { return nil }
-            return ActionDescriptor(id: "open-with.\(kind.rawValue)", title: label(for: kind), systemImageName: icon(for: kind), category: .open, supportedContexts: SelectionKind.allCases)
-        }
-    }
-
-    private static func label(for kind: ToolKind) -> String {
-        switch kind {
-        case .terminal: return "Terminal"
-        case .ghostty: return "Ghostty"
-        case .iTerm: return "iTerm"
-        case .vscode: return "VS Code"
-        case .cursor: return "Cursor"
-        case .zed: return "Zed"
-        case .claude: return "Claude"
-        case .codex: return "Codex"
-        case .gh: return "GitHub CLI"
-        case .lazygit: return "lazygit"
-        case .gitup: return "GitUp"
-        }
-    }
-
-    private static func icon(for kind: ToolKind) -> String {
-        switch kind {
-        case .terminal: return "terminal"
-        case .ghostty: return "bolt.horizontal.circle"
-        case .iTerm: return "greaterthan.circle"
-        case .vscode: return "chevron.left.forwardslash.chevron.right"
-        case .cursor: return "cursorarrow.rays"
-        case .zed: return "bolt.badge.a"
-        case .claude: return "sparkles"
-        case .codex: return "brain"
-        case .gh, .lazygit, .gitup: return "point.topleft.down.curvedto.point.bottomright.up"
-        }
-    }
-
-    private static func discoverScriptDescriptors() -> [ActionDescriptor] {
-        let urls = (try? FileManager.default.contentsOfDirectory(at: SharedPaths.scriptsDirectory(), includingPropertiesForKeys: nil)) ?? []
-        return urls.filter { $0.pathExtension != "" }.map {
-            ActionDescriptor(id: "script.run.\($0.lastPathComponent)", title: $0.deletingPathExtension().lastPathComponent, systemImageName: "terminal", category: .scripts, supportedContexts: SelectionKind.allCases)
-        }
+        ActionMenuBuilder.build(context: context, settings: settings)
     }
 }

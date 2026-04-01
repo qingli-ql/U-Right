@@ -22,6 +22,24 @@ public enum ActionCategory: String, Codable, CaseIterable, Sendable {
     case advanced
 }
 
+public enum ActionImplementationStatus: String, Codable, CaseIterable, Sendable {
+    case implemented
+    case beta
+    case planned
+    case hidden
+}
+
+public enum MenuCategoryDisplayStyle: String, Codable, CaseIterable, Sendable {
+    case inline
+    case submenu
+}
+
+public enum ActionChildrenPolicy: String, Codable, CaseIterable, Sendable {
+    case none
+    case builtInTemplates
+    case scripts
+}
+
 public enum ToolKind: String, Codable, CaseIterable, Sendable {
     case terminal
     case ghostty
@@ -122,8 +140,9 @@ public struct ActionDescriptor: Codable, Identifiable, Hashable, Sendable {
     public var executionMode: ActionExecutionMode
     public var children: [ActionDescriptor]
     public var statusBadge: String?
+    public var isEnabled: Bool
 
-    public init(id: String, title: String, systemImageName: String, category: ActionCategory, supportedContexts: [SelectionKind], executionMode: ActionExecutionMode = .hostApp, children: [ActionDescriptor] = [], statusBadge: String? = nil) {
+    public init(id: String, title: String, systemImageName: String, category: ActionCategory, supportedContexts: [SelectionKind], executionMode: ActionExecutionMode = .hostApp, children: [ActionDescriptor] = [], statusBadge: String? = nil, isEnabled: Bool = true) {
         self.id = id
         self.title = title
         self.systemImageName = systemImageName
@@ -132,6 +151,109 @@ public struct ActionDescriptor: Codable, Identifiable, Hashable, Sendable {
         self.executionMode = executionMode
         self.children = children
         self.statusBadge = statusBadge
+        self.isEnabled = isEnabled
+    }
+}
+
+public struct ActionRequirement: Codable, Hashable, Sendable {
+    public var requiredTool: ToolKind?
+    public var requiresAI: Bool
+    public var requiresWritableTarget: Bool
+    public var requiresSingleSelection: Bool
+    public var requiresDirectoryContext: Bool
+    public var isDestructive: Bool
+    public var needsConfirmation: Bool
+
+    public init(
+        requiredTool: ToolKind? = nil,
+        requiresAI: Bool = false,
+        requiresWritableTarget: Bool = false,
+        requiresSingleSelection: Bool = false,
+        requiresDirectoryContext: Bool = false,
+        isDestructive: Bool = false,
+        needsConfirmation: Bool = false
+    ) {
+        self.requiredTool = requiredTool
+        self.requiresAI = requiresAI
+        self.requiresWritableTarget = requiresWritableTarget
+        self.requiresSingleSelection = requiresSingleSelection
+        self.requiresDirectoryContext = requiresDirectoryContext
+        self.isDestructive = isDestructive
+        self.needsConfirmation = needsConfirmation
+    }
+}
+
+public struct ActionDefinition: Codable, Identifiable, Hashable, Sendable {
+    public var id: String
+    public var title: String
+    public var systemImageName: String
+    public var defaultCategory: ActionCategory
+    public var supportedContexts: [SelectionKind]
+    public var implementationStatus: ActionImplementationStatus
+    public var requirements: ActionRequirement
+    public var defaultOrder: Int
+    public var defaultVisible: Bool
+    public var childrenPolicy: ActionChildrenPolicy
+    public var executionMode: ActionExecutionMode
+
+    public init(
+        id: String,
+        title: String,
+        systemImageName: String,
+        defaultCategory: ActionCategory,
+        supportedContexts: [SelectionKind],
+        implementationStatus: ActionImplementationStatus = .implemented,
+        requirements: ActionRequirement = .init(),
+        defaultOrder: Int,
+        defaultVisible: Bool = true,
+        childrenPolicy: ActionChildrenPolicy = .none,
+        executionMode: ActionExecutionMode = .hostApp
+    ) {
+        self.id = id
+        self.title = title
+        self.systemImageName = systemImageName
+        self.defaultCategory = defaultCategory
+        self.supportedContexts = supportedContexts
+        self.implementationStatus = implementationStatus
+        self.requirements = requirements
+        self.defaultOrder = defaultOrder
+        self.defaultVisible = defaultVisible
+        self.childrenPolicy = childrenPolicy
+        self.executionMode = executionMode
+    }
+}
+
+public struct MenuCategoryDefinition: Codable, Hashable, Sendable {
+    public var category: ActionCategory
+    public var title: String
+    public var systemImageName: String
+    public var defaultOrder: Int
+    public var defaultDisplayStyle: MenuCategoryDisplayStyle
+
+    public init(
+        category: ActionCategory,
+        title: String,
+        systemImageName: String,
+        defaultOrder: Int,
+        defaultDisplayStyle: MenuCategoryDisplayStyle = .submenu
+    ) {
+        self.category = category
+        self.title = title
+        self.systemImageName = systemImageName
+        self.defaultOrder = defaultOrder
+        self.defaultDisplayStyle = defaultDisplayStyle
+    }
+}
+
+public struct ActionAvailability: Codable, Hashable, Sendable {
+    public var isVisible: Bool
+    public var isEnabled: Bool
+    public var disabledReason: String?
+
+    public init(isVisible: Bool, isEnabled: Bool, disabledReason: String? = nil) {
+        self.isVisible = isVisible
+        self.isEnabled = isEnabled
+        self.disabledReason = disabledReason
     }
 }
 
