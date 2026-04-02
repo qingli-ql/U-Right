@@ -62,11 +62,16 @@ final class ActionExecutionService {
     }
 
     func execute(request: ActionRequest, settings: AppSettings) -> ActionExecutionResult {
+        Logger.shared.info(
+            "dispatcher",
+            "Begin requestID=\(request.id.uuidString) action=\(request.actionID) selectionKind=\(request.context.selectionKind.rawValue) selectedCount=\(request.context.selectedURLs.count) primary=\(request.context.primaryURL?.path ?? "-") currentDir=\(request.context.currentDirectoryURL?.path ?? "-")"
+        )
         guard let definition = resolvedDefinition(for: request.actionID) else {
             Logger.shared.error("dispatcher", "Unknown action: \(request.actionID)")
             return .failure("未知动作：\(request.actionID)")
         }
         guard confirmation.confirmIfNeeded(actionID: request.actionID, definition: definition) else {
+            Logger.shared.info("dispatcher", "Action cancelled before execution: \(request.actionID)")
             return .userCancelled
         }
         guard let handler = registry.handler(for: request.actionID), handler.canPerform(actionID: request.actionID, context: request.context, settings: settings) else {
@@ -74,7 +79,16 @@ final class ActionExecutionService {
             return .failure("当前动作暂不可用：\(definition.title)")
         }
         do {
-            return try handler.perform(actionID: request.actionID, context: request.context, settings: settings)
+            let result = try handler.perform(actionID: request.actionID, context: request.context, settings: settings)
+            switch result {
+            case .success(let message):
+                Logger.shared.info("dispatcher", "Success requestID=\(request.id.uuidString) action=\(request.actionID) message=\(message ?? "-")")
+            case .userCancelled:
+                Logger.shared.info("dispatcher", "Cancelled requestID=\(request.id.uuidString) action=\(request.actionID)")
+            case .failure(let errorMessage):
+                Logger.shared.error("dispatcher", "Failure requestID=\(request.id.uuidString) action=\(request.actionID) error=\(errorMessage)")
+            }
+            return result
         } catch {
             Logger.shared.error("dispatcher", error.localizedDescription)
             return .failure(error.localizedDescription)

@@ -4,11 +4,16 @@ public final class Logger: @unchecked Sendable {
     public static let shared = Logger()
 
     private let queue = DispatchQueue(label: "com.openai.uright.logger", qos: .utility)
+    private let queueKey = DispatchSpecificKey<Void>()
     private let dateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter
     }()
+
+    private init() {
+        queue.setSpecific(key: queueKey, value: ())
+    }
 
     public func info(_ subsystem: String, _ message: String) {
         write(level: "INFO", subsystem: subsystem, message: message)
@@ -27,19 +32,29 @@ public final class Logger: @unchecked Sendable {
     private func write(level: String, subsystem: String, message: String) {
         let safeMessage = message.replacingOccurrences(of: SettingsStore.shared.load().apiKey, with: "***")
         let line = "\(dateFormatter.string(from: .now)) [\(level)] [\(subsystem)] \(safeMessage)\n"
-        queue.async {
+        let writeBlock = {
             let url = SharedPaths.logFileURL()
             if let data = line.data(using: .utf8) {
-                if FileManager.default.fileExists(atPath: url.path) {
-                    if let handle = try? FileHandle(forWritingTo: url) {
-                        try? handle.seekToEnd()
-                        try? handle.write(contentsOf: data)
-                        try? handle.close()
+                do {
+                    if FileManager.default.fileExists(atPath: url.path) {
+                        let handle = try FileHandle(forWritingTo: url)
+                        defer { try? handle.close() }
+                        try handle.seekToEnd()
+                        try handle.write(contentsOf: data)
+                    } else {
+                        try data.write(to: url, options: .atomic)
                     }
-                } else {
-                    try? data.write(to: url, options: .atomic)
+                } catch {
+                    DiagnosticLogger.emit("Failed to write log appGroup=\(URightConstants.appGroupIdentifier) path=\(url.path) subsystem=\(subsystem) error=\(error.localizedDescription)")
                 }
+            } else {
+                DiagnosticLogger.emit("Failed to encode log line appGroup=\(URightConstants.appGroupIdentifier) subsystem=\(subsystem)")
             }
+        }
+        if DispatchQueue.getSpecific(key: queueKey) != nil {
+            writeBlock()
+        } else {
+            queue.sync(execute: writeBlock)
         }
     }
 

@@ -1,7 +1,18 @@
 import AppKit
 import CryptoKit
+import Darwin
 import Foundation
 import UniformTypeIdentifiers
+
+enum DiagnosticLogger {
+    static func emit(_ message: String) {
+        let line = "[URight] \(message)\n"
+        if let data = line.data(using: .utf8) {
+            FileHandle.standardError.write(data)
+        }
+        NSLog("%@", message)
+    }
+}
 
 public enum FileSystemHelper {
     public static func metadata(for url: URL) -> FileMetadata {
@@ -56,19 +67,29 @@ public enum FileSystemHelper {
 }
 
 public enum SharedPaths {
+    private static func createDirectory(at url: URL, purpose: String) {
+        do {
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        } catch {
+            DiagnosticLogger.emit("Failed to create \(purpose) directory at \(url.path) appGroup=\(URightConstants.appGroupIdentifier) error=\(error.localizedDescription)")
+        }
+    }
+
     public static func appGroupContainerURL() -> URL {
-        if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: URightConstants.appGroupIdentifier) {
+        let appGroupIdentifier = URightConstants.appGroupIdentifier
+        if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) {
             return url
         }
         let fallback = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Application Support/\(URightConstants.appName)", isDirectory: true)
-        try? FileManager.default.createDirectory(at: fallback, withIntermediateDirectories: true)
+        DiagnosticLogger.emit("Falling back to Application Support path appGroup=\(appGroupIdentifier) path=\(fallback.path)")
+        createDirectory(at: fallback, purpose: "fallback app support")
         return fallback
     }
 
     public static func requestsDirectory() -> URL {
         let directory = appGroupContainerURL().appendingPathComponent(URightConstants.requestDirectoryName, isDirectory: true)
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        createDirectory(at: directory, purpose: "requests")
         return directory
     }
 
@@ -76,15 +97,38 @@ public enum SharedPaths {
         appGroupContainerURL().appendingPathComponent(URightConstants.logFileName)
     }
 
+    public static func devHostStateFileURL() -> URL {
+        appGroupContainerURL().appendingPathComponent(URightConstants.devHostStateFileName)
+    }
+
     public static func builtInTemplatesDirectory() -> URL {
         let directory = appGroupContainerURL().appendingPathComponent(URightConstants.templateDirectoryName, isDirectory: true)
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        createDirectory(at: directory, purpose: "templates")
         return directory
     }
 
     public static func scriptsDirectory() -> URL {
         let directory = appGroupContainerURL().appendingPathComponent(URightConstants.scriptsDirectoryName, isDirectory: true)
-        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        createDirectory(at: directory, purpose: "scripts")
         return directory
+    }
+
+    public static func hasActiveDevHost() -> Bool {
+        let url = devHostStateFileURL()
+        guard
+            let data = try? Data(contentsOf: url),
+            let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let pid = payload["pid"] as? Int
+        else {
+            return false
+        }
+
+        if kill(pid_t(pid), 0) == 0 || errno == EPERM {
+            return true
+        }
+
+        try? FileManager.default.removeItem(at: url)
+        DiagnosticLogger.emit("Removed stale dev host marker at \(url.path) pid=\(pid)")
+        return false
     }
 }

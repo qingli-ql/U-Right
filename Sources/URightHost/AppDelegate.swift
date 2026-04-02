@@ -9,11 +9,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let logController = LogWindowController()
     private let onboardingController = OnboardingWindowController()
     private let dispatcher = HostActionDispatcher()
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         buildStatusItem()
         registerNotifications()
         installDefaultTemplatesIfNeeded()
-        Logger.shared.info("host", "U-Right host launched")
+        Logger.shared.info("host", "U-Right host launched appGroup=\(URightConstants.appGroupIdentifier) sharedRoot=\(SharedPaths.appGroupContainerURL().path)")
+        consumePendingRequests(reason: "launch")
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -23,8 +25,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func buildStatusItem() {
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "cursorarrow.click.2", accessibilityDescription: "U-Right")
-            button.imagePosition = .imageOnly
+            if let icon = ((NSApp.applicationIconImage?.copy() as? NSImage) ?? NSApp.applicationIconImage) {
+                icon.size = NSSize(width: 18, height: 18)
+                button.image = icon
+                button.imagePosition = .imageOnly
+            }
         }
         statusItem.menu = NSMenu(title: "U-Right")
         statusItem.menu?.items = [
@@ -44,6 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func registerNotifications() {
+        Logger.shared.info("host", "Registering distributed notification observer")
         DistributedNotificationCenter.default().addObserver(
             self,
             selector: #selector(handleActionRequest(_:)),
@@ -69,8 +75,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Logger.shared.info("host", "Notification received: object=\(requestID ?? "-") hasPayload=\((userInfo?[ActionHandoff.payloadUserInfoKey] as? String) != nil)")
         guard let requestID,
               let request = ActionHandoff.loadRequest(id: requestID, userInfo: userInfo) else { return }
-        Logger.shared.info("host", "Received action \(request.actionID)")
+        Logger.shared.info("host", "Dispatching request from notification requestID=\(request.id.uuidString) action=\(request.actionID)")
         dispatcher.perform(request: request)
+    }
+
+    private func consumePendingRequests(reason: String) {
+        let directory = SharedPaths.requestsDirectory()
+        let urls = ((try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? [])
+            .filter { $0.pathExtension == "json" }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
+
+        Logger.shared.info("host", "Pending request sweep reason=\(reason) count=\(urls.count)")
+        for url in urls {
+            consumeRequestFile(at: url, reason: reason)
+        }
+    }
+
+    private func consumeRequestFile(at url: URL, reason: String) {
+        do {
+            let data = try Data(contentsOf: url)
+            let request = try JSONDecoder().decode(ActionRequest.self, from: data)
+            try? FileManager.default.removeItem(at: url)
+            Logger.shared.info("host", "Dispatching pending request requestID=\(request.id.uuidString) action=\(request.actionID) reason=\(reason)")
+            dispatcher.perform(request: request)
+        } catch {
+            Logger.shared.error("host", "Failed to consume request file \(url.lastPathComponent): \(error.localizedDescription)")
+        }
     }
 
     @objc private func openSettings() {

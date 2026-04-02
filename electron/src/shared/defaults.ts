@@ -32,6 +32,38 @@ export const KNOWN_ACTIONS: Array<{ id: string; title: string; category: ActionC
   { id: "submenu.scripts", title: "Scripts", category: "scripts" }
 ];
 
+export function actionTitleFor(actionID: string): string {
+  const known = KNOWN_ACTIONS.find((item) => item.id === actionID);
+  if (known) {
+    return known.title;
+  }
+  if (actionID.startsWith("create.template.")) {
+    const templateID = actionID.slice("create.template.".length);
+    const template = BUILT_IN_TEMPLATE_TITLES[templateID];
+    return template ?? actionID;
+  }
+  if (actionID.startsWith("script.run.")) {
+    return actionID.slice("script.run.".length);
+  }
+  return actionID;
+}
+
+const BUILT_IN_TEMPLATE_TITLES: Record<string, string> = {
+  empty: "Empty File...",
+  text: "Text File",
+  markdown: "Markdown File",
+  json: "JSON File",
+  python: "Python File",
+  shell: "Shell Script",
+  html: "HTML File",
+  css: "CSS File",
+  javascript: "JavaScript File",
+  typescript: "TypeScript File",
+  readme: "README.md",
+  gitignore: ".gitignore",
+  env: ".env"
+};
+
 export const TOOL_ORDER: ToolKind[] = [
   "terminal",
   "ghostty",

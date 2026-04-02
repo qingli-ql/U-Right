@@ -24,6 +24,7 @@ function formatActionTitle(actionID: string) {
 function LogoMark() {
   return (
     <div className="logo-mark" aria-hidden="true">
+      <span className="logo-mark-ring" />
       <span className="logo-mark-u">U</span>
       <span className="logo-mark-slash" />
       <span className="logo-mark-r">R</span>
@@ -312,9 +313,15 @@ function SettingsView() {
             </section>
           )}
 
-          <footer className="footer-bar">
-            <span>{savedMessage || "Ready for Finder-driven workflows."}</span>
-            <button className="primary-button" onClick={() => void save()}>Save Shared Settings</button>
+          <footer className="footer-bar footer-dock">
+            <div className="footer-copy">
+              <strong>{savedMessage || "Settings are ready to publish"}</strong>
+              <p>Changes here flow into the shared Finder + Host configuration.</p>
+            </div>
+            <div className="footer-actions">
+              <span className="footer-badge">Shared JSON</span>
+              <button className="primary-button" onClick={() => void save()}>Save Shared Settings</button>
+            </div>
           </footer>
         </main>
       </div>
@@ -383,9 +390,41 @@ function ResultView({ payload }: { payload: ResultWindowPayload }) {
 function LogsView() {
   const api = getUrightAPI();
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [isClearing, setIsClearing] = useState(false);
+
   useEffect(() => {
-    void api.loadLogs().then(setLogs);
+    let cancelled = false;
+
+    const refresh = async () => {
+      const nextLogs = await api.loadLogs();
+      if (!cancelled) {
+        setLogs(nextLogs);
+      }
+    };
+
+    void refresh();
+    const timer = window.setInterval(() => {
+      void refresh();
+    }, 700);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
   }, [api]);
+
+  const orderedLogs = useMemo(() => logs.slice().reverse(), [logs]);
+
+  async function handleClearLogs() {
+    setIsClearing(true);
+    try {
+      const nextLogs = await api.clearLogs();
+      setLogs(nextLogs);
+    } finally {
+      setIsClearing(false);
+    }
+  }
+
   return (
     <Shell chromeTitle="Logs & Visibility" chromeMeta="Structured Logs">
       <div className="window logs-window">
@@ -394,13 +433,22 @@ function LogsView() {
             <p className="eyebrow">Structured Logs</p>
             <h2>Host + Finder bridge visibility</h2>
           </div>
+          <div className="footer-actions">
+            <div className="footer-badge">{logs.length} entries</div>
+            <button className="secondary-button" disabled={isClearing} onClick={() => void handleClearLogs()}>
+              {isClearing ? "Clearing..." : "Clear Logs"}
+            </button>
+          </div>
         </div>
         <div className="log-list">
-          {logs.length === 0 && <p className="muted">No logs yet.</p>}
-          {logs.map((entry) => (
-            <div key={entry.id} className="log-entry">
-              <span>{entry.level}</span>
-              <strong>{entry.subsystem}</strong>
+          {orderedLogs.length === 0 && <p className="muted">No logs yet.</p>}
+          {orderedLogs.map((entry) => (
+            <div key={entry.id} className={`log-entry log-entry-${entry.level.toLowerCase()}`}>
+              <div className="log-entry-meta">
+                <span>{entry.level}</span>
+                <strong>{entry.subsystem}</strong>
+                <time>{entry.timestamp || "-"}</time>
+              </div>
               <p>{entry.message}</p>
             </div>
           ))}

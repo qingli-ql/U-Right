@@ -24,5 +24,7 @@
     <true/>
     <key>NSHumanReadableCopyright</key>
     <string>OpenAI Prototype</string>
+    <key>URightAppGroupIdentifier</key>
+    <string>$(APP_GROUP_IDENTIFIER)</string>
 </dict>
 </plist>

@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld("uright", {
   detectTools: () => ipcRenderer.invoke("tools:detect") as Promise<Record<string, ToolAvailability>>,
   chooseDirectory: () => ipcRenderer.invoke("dialog:choose-directory") as Promise<string | null>,
   loadLogs: () => ipcRenderer.invoke("logs:load") as Promise<LogEntry[]>,
+  clearLogs: () => ipcRenderer.invoke("logs:clear") as Promise<LogEntry[]>,
   submitPrompt: (value: string | null) => ipcRenderer.invoke("prompt:submit", value) as Promise<void>,
   saveResult: (markdown: string, fileName?: string) => ipcRenderer.invoke("result:save", markdown, fileName) as Promise<void>,
   applyResult: (markdown: string, filePath?: string | null) => ipcRenderer.invoke("result:apply", markdown, filePath) as Promise<void>,

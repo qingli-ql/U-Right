@@ -6,10 +6,12 @@ final class ExternalToolService {
     func open(urls: [URL], using tool: ToolKind, context: FinderActionContext) throws {
         let targetURLs = urls.isEmpty ? [context.workingDirectoryURL].compactMap { $0 } : urls
         guard !targetURLs.isEmpty else {
+            Logger.shared.error("tools", "Open request has no target tool=\(tool.rawValue)")
             throw HostCommandError.invalidContext("没有可打开的目标")
         }
 
         let tools = context.detectedTools
+        Logger.shared.info("tools", "Open request tool=\(tool.rawValue) targetCount=\(targetURLs.count) firstTarget=\(targetURLs.first?.path ?? "-")")
         switch tool {
         case .terminal:
             try openWithApplication(named: "Terminal", urls: [targetURLs.first!])
@@ -33,11 +35,13 @@ final class ExternalToolService {
     }
 
     func runScript(at url: URL, in workingDirectory: URL?) throws {
+        Logger.shared.info("tools", "Run script path=\(url.path) cwd=\(workingDirectory?.path ?? "-")")
         try runDetached(executable: "/bin/zsh", arguments: [url.path], currentDirectory: workingDirectory)
     }
 
     private func openEditor(tool: ToolKind, urls: [URL], tools: [ToolKind: ToolAvailability]) throws {
         if let cli = tools[tool]?.executablePath {
+            Logger.shared.info("tools", "Opening editor via CLI tool=\(tool.rawValue) cli=\(cli) firstTarget=\(urls.first?.path ?? "-")")
             try runDetached(executable: cli, arguments: urls.map(\.path))
             return
         }
@@ -47,13 +51,16 @@ final class ExternalToolService {
         case .zed: "Zed"
         default: "Terminal"
         }
+        Logger.shared.info("tools", "Opening editor via app tool=\(tool.rawValue) app=\(appName) firstTarget=\(urls.first?.path ?? "-")")
         try openWithApplication(named: appName, urls: urls)
     }
 
     private func openWithApplication(named appName: String, urls: [URL]) throws {
         let configuration = NSWorkspace.OpenConfiguration()
         configuration.activates = true
-        NSWorkspace.shared.open(urls, withApplicationAt: NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID(for: appName)) ?? URL(fileURLWithPath: "/Applications/\(appName).app"), configuration: configuration)
+        let applicationURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID(for: appName)) ?? URL(fileURLWithPath: "/Applications/\(appName).app")
+        Logger.shared.info("tools", "NSWorkspace open app=\(appName) appURL=\(applicationURL.path) targetCount=\(urls.count)")
+        NSWorkspace.shared.open(urls, withApplicationAt: applicationURL, configuration: configuration)
     }
 
     private func bundleID(for appName: String) -> String {
@@ -72,6 +79,7 @@ final class ExternalToolService {
         process.executableURL = URL(fileURLWithPath: executable)
         process.arguments = arguments
         process.currentDirectoryURL = currentDirectory
+        Logger.shared.info("tools", "Run detached executable=\(executable) args=\(arguments.joined(separator: " ")) cwd=\(currentDirectory?.path ?? "-")")
         try process.run()
     }
 }

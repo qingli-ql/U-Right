@@ -14,13 +14,16 @@
 
 ## 最终结论
 
-这次问题的根因一共分成两层：
+这次问题的根因一共分成三层：
 
 1. 最初使用的是错误的手工打包产物  
    `.appex` 内部放进去的是一个 `dylib`，不是 Finder Sync 真正可执行扩展，所以系统不会正确注册，也不会被 Finder 加载。
 
 2. 切到 Xcode 原生产物之后，又存在多份相同 bundle id 的扩展副本  
    `pluginkit` 中同时出现了多个 `com.openai.uright.findersync`，会让“系统当前到底用哪一份”变得不直观，增加误判概率。
+
+3. 即使最终只保留 `/Applications/U-Right.app`，安装与刷新脚本也曾存在竞态  
+   旧的 `make dev-install CONFIG=Debug && make reload-extension` 会把 App 覆盖到同一路径，但没有总是先把“当前已注册的同路径 appex”干净下线，也没有等待 `pluginkit` 真正重新注册并进入 enabled 状态。结果就是 Finder 右键会出现“有时候在，有时候不在”的偶发现象。
 
 另外还有一个高频误区：
 
@@ -87,6 +90,37 @@ Finder 菜单是否出现，取决于：
 
 它们 bundle id 一样，都会出现在插件注册表里。  
 如果同时存在，容易误判“当前 Finder 正在使用哪一份扩展”。
+
+### 5. 同一路径重装也可能把注册状态弄脏
+
+后续继续排查时还发现，就算只使用 `/Applications/U-Right.app`，只要安装脚本是“先删 app、再覆盖、最后碰运气重新注册”，Finder Sync 仍可能进入半旧半新的状态。
+
+旧链路的问题在于：
+
+- `install_app.sh` 没有总是先注销当前已安装的 appex
+- `reload_extension.sh` 只有在“当前路径不是目标路径”时才移除旧扩展
+- 脚本没有等待 `pluginkit` 真正回到目标路径且进入 enabled 状态
+
+### 6. 开发入口起不来，不一定是 Finder 扩展问题
+
+后续切到 `make dev` 之后，又踩到一类非常迷惑的问题：
+
+- Finder 扩展已经成功安装并 reload
+- `pluginkit` 也显示正常
+- 但 Electron dev 启动阶段失败，提示 `Port 5187 is already in use`
+
+这时候根因通常不是 Finder 扩展，而是旧的 Electron dev 进程没有清干净。
+
+典型残留包括：
+
+- `npm run electron:dev`
+- `concurrently`
+- `vite`
+- `tsc --watch`
+- `wait-on`
+- `electron`
+
+如果这些老进程还活着，新的一轮 `make dev` 会在 renderer 端口冲突时直接失败，看起来像“整个系统链路又坏了”。
 
 ## 推荐的 debug 思路
 
@@ -172,6 +206,21 @@ killall Finder
 open /Applications/U-Right.app
 ```
 
+如果当前项目已经切到新的统一开发入口，优先直接用：
+
+```bash
+make dev
+```
+
+它会自动完成：
+
+- 安装 `/Applications/U-Right.app`
+- 重新注册并启用 Finder Sync 扩展
+- 重启 Finder
+- 启动 Electron 开发宿主
+
+如果 `make dev` 失败，但 `pluginkit -m -A -D -i com.openai.uright.findersync -vv` 仍然正常，那要优先怀疑 Electron dev 侧的旧 watcher 残留，而不是 Finder Sync 本身。
+
 ### Step 7：做最小化验证
 
 不要一开始就测复杂功能。  
@@ -255,6 +304,40 @@ pluginkit -m -D -i com.openai.uright.findersync -vv
 
 也就是说，现在推荐的调试入口不再区分“开发副本”和“安装副本”，统一以安装版为准。
 
+### 修复点 6：把安装与扩展重载做成幂等流程
+
+后续又修了一轮脚本，把“偶发丢右键”的问题彻底收住：
+
+- 安装前先卸载当前已注册的 Finder Sync 扩展
+- 停掉旧宿主和旧扩展进程
+- 用临时目录原子替换 `/Applications/U-Right.app`
+- 显式重新 `pluginkit -a` 注册扩展
+- 显式 `pluginkit -e use` 启用扩展
+- 等待 `pluginkit -m -A -D` 真正回到目标路径且进入 enabled 状态
+- 再重启 Finder
+
+这样修完后：
+
+- `make dev-install CONFIG=Debug && make reload-extension`
+  可以稳定恢复右键
+- `make dev`
+  成为当前推荐的一键开发入口
+
+### 修复点 7：把 `make dev` 的旧 watcher 清理做成确定性流程
+
+后续又修了一轮 `scripts/dev_electron.sh`，把 “端口 5187 被旧进程占用” 这类问题收进主流程：
+
+- 启动前按项目根路径和历史命令模式清理旧的 Electron dev 进程
+- 额外检查 `lsof -iTCP:5187`
+- 如果普通 `TERM` 不退出，就按 PID 做 `KILL`
+- 只有端口真正释放后，才继续启动新的 `vite + tsc --watch + electron`
+
+这一步的教训是：
+
+- `pkill -f 某一串命令` 不一定足够稳
+- 开发编排脚本要按端口状态做最终验收
+- `make dev` 失败时，要先分清是 Finder 扩展层失败，还是 Electron dev 层失败
+
 ## 以后再遇到类似问题时的判断口诀
 
 如果 Finder 菜单不出现，优先按这个顺序怀疑：
@@ -283,11 +366,12 @@ xcodebuild -project URight.xcodeproj -scheme URightHostApp -configuration Debug 
 当前推荐命令：
 
 ```bash
-make run CONFIG=Debug
+make dev
 ```
 
 它会确保：
 
 - 先安装最新构建
-- 再打开 `/Applications/U-Right.app`
+- 再刷新并启用 Finder Sync 扩展
+- 再启动 Electron 开发宿主
 - Finder 扩展验证始终围绕同一份 app 进行

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		04A877F6B0A9E78E1A61C065 /* PromptPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F49A00E26424B5AA99E132 /* PromptPanelController.swift */; };
+		08F401A1C0C44E1DBF2A9C11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08F401A1C0C44E1DBF2A9C10 /* Assets.xcassets */; };
 		0C315F8C5F36D162228AADA3 /* FinderSync.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C4CFE41F72CACCCE7A40DA /* FinderSync.framework */; };
 		0C9BB4B6C4F7BA87B25266E4 /* OnboardingWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2E7DA1BCEF6ECA7B4AD6A5E /* OnboardingWindowController.swift */; };
 		17B738F0C2A388133DC5FD9E /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EDFB9BF14CC0D151CA972A9 /* AppKit.framework */; };
@@ -56,6 +57,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		08F401A1C0C44E1DBF2A9C10 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0D17D92872285F73BCB6837C /* ActionExecutionService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ActionExecutionService.swift; path = Services/ActionExecutionService.swift; sourceTree = "<group>"; };
 		159A19D2CD07AD29F98B97D8 /* SettingsWindowController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsWindowController.swift; path = UI/SettingsWindowController.swift; sourceTree = "<group>"; };
 		1A9AD36E16C5B6E5238A7BDD /* AIService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AIService.swift; path = Services/AIService.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 		83C1B5A7FF995F6A0262B398 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				08F401A1C0C44E1DBF2A9C10 /* Assets.xcassets */,
 			);
 			name = App;
 			path = App;
@@ -289,6 +292,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				08F401A1C0C44E1DBF2A9C11 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -408,8 +412,10 @@
 		AE627AB28C71E25F2896C48D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP_IDENTIFIER = group.com.openai.uright;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Resources/App/URightHost.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -431,8 +437,10 @@
 		C610E34E8379943EC4C762C2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP_IDENTIFIER = group.com.openai.uright;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Resources/App/URightHost.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -510,6 +518,7 @@
 		EBFF83FEB0B5D17081DF626F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP_IDENTIFIER = group.com.openai.uright;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = Resources/Extension/URightFinderExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -533,6 +542,7 @@
 		ED0EDA7EBE415DDED97F3D9C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APP_GROUP_IDENTIFIER = group.com.openai.uright;
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = Resources/Extension/URightFinderExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;

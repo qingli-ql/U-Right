@@ -8,11 +8,14 @@
 
 项目已经从“概念骨架”进入到“可运行原型”阶段，最关键的系统链路已经打通：
 
-- 原生 `U-Right.app` 菜单栏宿主已可构建
+- 原生 `U-Right.app` 与 Electron Host 两条宿主链路都已可构建
 - `Finder Sync Extension` 已可被系统识别、注册并在 Finder 中显示菜单
-- Host / Extension / Shared 三层结构已经建立
+- Host / Extension / Shared 三层结构已经建立，并开始向“原生扩展 + Electron 宿主”收敛
 - 一批核心菜单动作已经有实现
 - Claude / Codex 基础链路已接入
+- 日常开发入口已经收敛为一键 `make dev`
+- `Copy Path` 与 `Open in VS Code` 在 Electron 主链路上已恢复可用
+- Dock 图标与菜单栏图标已经开始统一到 `AppIcon.appiconset`
 
 但整体仍然是 **MVP 原型阶段**，还没有达到“完整产品可发布”的程度。
 
@@ -24,19 +27,26 @@
 - 已建立两个原生 target：
   - `URightHostApp`
   - `URightFinderSync`
+- 已建立 `electron/` 宿主工程：
+  - Electron Main
+  - React Renderer
+  - Preload Bridge
 - `Package.swift` 已收敛为只提供 `URightShared`
 - Finder Sync 扩展已经是合法的 `Mach-O executable`
 - `pluginkit` 已能识别 `com.openai.uright.findersync`
 - Finder 中已经可以看到 `U-Right` 菜单
+- `make dev` / `make dev-run` / `make electron-dev` 已统一为同一条开发链路
 
 ### 2. 模块边界
 
 - `Sources/URightShared`
   - 常量、模型、设置、日志、模板、工具检测、动作注册表、handoff
 - `Sources/URightHost`
-  - 菜单栏宿主、设置窗口、日志窗口、AI 面板、动作调度
+  - 旧的原生宿主实现、设置窗口、日志窗口、AI 面板、动作调度
 - `Sources/URightFinderExtension`
   - Finder 菜单生成、上下文采集、请求转发
+- `electron/`
+  - 新的宿主 UI 主线、请求监听、动作执行框架、设置/日志/结果窗口
 
 ### 3. Finder 菜单与上下文
 
@@ -76,6 +86,13 @@
 - `Convert Line Endings`
 - `Toggle Executable Bit`
 
+这轮已额外确认并修通：
+
+- `Copy Path`
+- `Open in VS Code`
+
+它们之前在 Electron 路径下失效的根因不是菜单生成，而是 Finder 传来的 `file://...` URL 在执行器里被误当成本地路径直接使用。
+
 ### 5. AI 基础能力
 
 - 已有 AI 动作入口：
@@ -97,18 +114,38 @@
 ### 6. 设置与日志
 
 - 设置窗口已经存在
-- `App Group UserDefaults` 持久化已接入
+- 共享 JSON 持久化已接入
+- Electron 与 Finder Extension 已围绕共享 JSON / 请求目录收口
 - 日志写文件已接入
 - 日志窗口已接入
 - 模板目录与脚本目录的基础扫描逻辑已接入
 
-### 7. 排障经验沉淀
+### 7. Electron Host UI 主线已建立
+
+- `Electron + TypeScript + React + Vite` 主线已接上
+- Settings / Prompt / Result / Logs / Onboarding 已有统一 renderer
+- `preload -> contextBridge -> renderer` 基础 bridge 已建立
+- 主进程已开始接入窗口级加载与 console 诊断日志
+- UI 已从早期黑色原型风切到浅色纸面风
+- 窗口拖动区已通过自定义 chrome bar 接回
+- Electron Dock 图标已切到 `Resources/App/Assets.xcassets/AppIcon.appiconset`
+- Electron Tray 图标已开始复用同一套 `AppIcon` PNG 资源
+
+### 8. 排障经验沉淀
 
 - Finder Sync 排障记录已完成
 - 已明确：
   - `File Provider` 和 `Finder Extensions` 不是一回事
   - `.appex` 必须是 executable，不能是 dylib
   - `pluginkit`、`file`、`codesign`、`log stream` 是首选排障工具
+- Electron 侧也已新增经验：
+  - 旧的 `vite` / `electron` / `wait-on` 进程会导致错误入口被复用
+  - preload bridge 问题要优先排查运行入口是否一致
+  - `make dev` 应作为当前开发主入口，而不是手工拼接旧命令
+  - `dev-install` / `reload-extension` 的旧竞态已经通过脚本幂等化修复
+  - Finder 传给 Electron 的路径字段是 `file://...` URL，不是天然可直接拿来 `spawn` 或拼接文件系统路径
+  - `pkill -f` 按命令字符串匹配并不总可靠，开发清理脚本需要按 PID、按端口、按项目特征三层兜底
+  - macOS 菜单栏图标和 Dock 图标不能偷懒复用“任意普通图”，最好统一挂在 `AppIcon.appiconset` 或专门的 template icon 资源上
 
 相关文档：
 
@@ -121,7 +158,7 @@
 ### 1. 设置体验
 
 - 设置窗口已经有基础 UI
-- 但还比较原型化，距离“polished native settings”还有差距
+- 视觉风格已进入第二版，但信息架构仍偏原型
 - Launch at Login、扩展状态展示、可执行路径测试等还未做完整闭环
 
 ### 2. AI 结果体验
@@ -143,8 +180,9 @@
 ### 5. 构建链路
 
 - `xcodebuild` 主链路已经可以成功构建
-- 但仓库里仍保留了旧的手工打包脚本路径，容易混淆
-- Makefile 与 README 还需要进一步统一到 Xcode 主路径
+- Finder 扩展安装、重载、Electron 开发宿主启动已经收敛到 `make dev`
+- 原生宿主仍保留为兼容/对照路径，但不再是默认开发入口
+- 打包后 Electron app 与原生宿主的正式嵌入链路还未完成
 
 ## 未完成
 
@@ -186,9 +224,10 @@
 ### 3. 原生 UI 细节未打磨
 
 - 新文件输入面板仍是 `NSAlert` 风格，不是更精致的无边框小面板
-- 设置页和结果页仍偏工程原型
+- 设置页和结果页已有视觉升级，但离完整产品语言还差一轮收敛
 - 危险操作确认流程还可以更一致
-- 深色模式 / 视觉层次 / 图标细节仍需打磨
+- 图标体系、品牌视觉、组件统一性仍需打磨
+- 当前顶部状态栏图标虽然已切到应用图标资源，但还不是更适合 macOS 菜单栏的单色 template 版本
 
 ### 4. 发布级签名与分发
 
@@ -213,7 +252,7 @@
 
 ### 1. README 与旧脚本仍可能误导
 
-仓库中仍存在旧的手工构建/打包路径描述，容易让人再次运行到旧产物。
+虽然主线入口已经收敛为 `make dev`，但仓库里仍保留原生宿主与历史命令说明，初次进入项目的人仍可能被旧路径干扰。
 
 ### 2. 多份同 bundle id 副本会干扰调试
 
@@ -225,7 +264,34 @@
 
 同时存在并被注册，调试时很容易混淆 Finder 实际加载的是哪一份。
 
-### 3. 功能声明多于实际完成度
+### 3. Electron 多进程开发环境容易残留旧状态
+
+如果旧的：
+
+- `vite --config electron/vite.config.ts`
+- `wait-on`
+- `electron electron/dist/main/...`
+
+进程没有清干净，新的窗口可能会连到旧 renderer / 旧 main 入口，表现为：
+
+- bridge 丢失
+- 页面黑屏
+- UI 与代码不一致
+
+当前已经把清理逻辑收进 `scripts/dev_electron.sh`，但这仍然是一个需要持续警惕的风险点。
+
+### 4. Finder URL 与本地路径语义容易混淆
+
+Finder 扩展写入到请求目录里的上下文字段，在 Electron 看见的是 `file://...` URL。  
+如果执行器直接把它们当本地路径：
+
+- `Copy Path` 会复制出错误格式
+- `Open in VS Code` / `Open in Cursor` 一类动作会把错误参数传给外部程序
+- 创建文件、创建目录等动作也可能拼出错误路径
+
+当前已经在 Electron 执行器里补了统一转换，但后续新增动作仍要优先复用这层路径归一化。
+
+### 5. 功能声明多于实际完成度
 
 当前菜单定义覆盖面很广，但真正完全走通的功能只占其中一部分。  
 这意味着接下来需要做一次“菜单声明 vs 实际实现”的收敛，避免 UI 过度承诺。
@@ -238,7 +304,12 @@
 
 - Makefile 已统一切到 `xcodebuild`
 - README 构建说明已统一切到 Xcode 主路径
-- `make run` 已统一为“先安装，再打开 `/Applications/U-Right.app`”
+- `make dev` / `make dev-run` / `make electron-dev` 已统一到 `scripts/dev_electron.sh`
+- 当前 `make dev` 会：
+  - 安装 `/Applications/U-Right.app`
+  - reload Finder Extension
+  - 清理旧 Electron dev 进程和占用 5187 的残留 watcher
+  - 启动当前 Electron 主进程与 renderer
 - 下一步仍建议把旧路径说明继续降权，并减少重复副本残留
 
 ### Phase 2：收敛菜单承诺
@@ -258,6 +329,9 @@
 - Open in Terminal / Ghostty / VS Code / Cursor / Zed
 - Copy Path
 - Move to Trash
+- Settings 主首页信息架构收敛
+- Prompt / Result / Logs 的统一品牌与视觉语言
+- Electron bridge 与错误提示再增强一轮
 - Ask Claude About This
 - Ask Codex About This
 - Settings 持久化

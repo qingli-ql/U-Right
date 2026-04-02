@@ -2,16 +2,72 @@ import { app, BrowserWindow, Menu, Tray, ipcMain, dialog, nativeImage, shell } f
 import path from "node:path";
 import fs from "node:fs";
 import type { AppSettings, PromptWindowPayload, ResultWindowPayload, WindowContextPayload } from "../shared/contracts";
+import { getUrightBrandDataURL } from "../shared/brand";
 import { loadSettings, saveSettings, getSharedPaths } from "./store";
 import { detectTools } from "./tool-detection";
-import { loadLogs } from "./logs";
+import { clearLogs, loadLogs } from "./logs";
 import { startRequestWatcher } from "./request-watcher";
+import { appendLog } from "./logs";
 
 type WindowKind = WindowContextPayload["kind"];
 
 const windowState = new Map<number, WindowContextPayload>();
 const pendingPromptResolvers = new Map<number, (value: string | null) => void>();
 let tray: Tray | null = null;
+
+function writeDevHostState() {
+  if (process.env.URIGHT_DEV_HOST !== "1") {
+    return;
+  }
+  const { root } = getSharedPaths();
+  const markerPath = path.join(root, "dev-host-state.json");
+  fs.mkdirSync(root, { recursive: true });
+  fs.writeFileSync(
+    markerPath,
+    JSON.stringify({
+      pid: process.pid,
+      startedAt: new Date().toISOString(),
+      mode: "electron-dev"
+    }),
+    "utf8"
+  );
+  appendLog("INFO", "electron-host", `Registered dev host marker path=${markerPath} pid=${process.pid}`);
+}
+
+function clearDevHostState() {
+  const { root } = getSharedPaths();
+  const markerPath = path.join(root, "dev-host-state.json");
+  fs.rmSync(markerPath, { force: true });
+  appendLog("INFO", "electron-host", `Cleared dev host marker path=${markerPath} pid=${process.pid}`);
+}
+
+function appIconPath(fileName: string) {
+  return path.join(process.cwd(), "Resources", "App", "Assets.xcassets", "AppIcon.appiconset", fileName);
+}
+
+function loadAppIcon(fileName: string, size?: { width: number; height: number }) {
+  const filePath = appIconPath(fileName);
+  if (!fs.existsSync(filePath)) {
+    return nativeImage.createEmpty();
+  }
+  const image = nativeImage.createFromPath(filePath);
+  if (image.isEmpty()) {
+    return image;
+  }
+  return size ? image.resize(size) : image;
+}
+
+function loadBrandIcon(fileName: string, size?: { width: number; height: number }) {
+  const image = loadAppIcon(fileName, size);
+  if (!image.isEmpty()) {
+    return image;
+  }
+  const fallback = nativeImage.createFromDataURL(getUrightBrandDataURL());
+  if (fallback.isEmpty()) {
+    return fallback;
+  }
+  return size ? fallback.resize(size) : fallback;
+}
 
 function rendererURL() {
   const devServerURL = process.env.VITE_DEV_SERVER_URL;
@@ -30,10 +86,11 @@ function createWindow(kind: WindowKind, size: { width: number; height: number },
   const window = new BrowserWindow({
     width: size.width,
     height: size.height,
-    backgroundColor: "#0a0d10",
-    titleBarStyle: "hiddenInset",
+    title: "",
+    backgroundColor: "#f6efe2",
+    titleBarStyle: "hidden",
+    trafficLightPosition: { x: 18, y: 18 },
     show: false,
-    vibrancy: "under-window",
     webPreferences: {
       preload: preloadPath,
       contextIsolation: true,
@@ -65,8 +122,9 @@ function createWindow(kind: WindowKind, size: { width: number; height: number },
 }
 
 function createTray(controller: WindowController) {
-  tray = new Tray(nativeImage.createEmpty());
-  tray.setTitle("U-Right");
+  const trayImage = loadBrandIcon("icon_32x32@2x.png", { width: 18, height: 18 });
+  tray = new Tray(trayImage);
+  tray.setTitle("");
   tray.setContextMenu(
     Menu.buildFromTemplate([
       { label: "Settings", click: () => controller.openSettings() },
@@ -142,6 +200,20 @@ function createController(): WindowController {
 }
 
 async function bootstrap() {
+  writeDevHostState();
+
+  if (process.platform === "darwin" && app.dock) {
+    const dockIcon = loadBrandIcon("icon_512x512@2x.png");
+    if (!dockIcon.isEmpty()) {
+      app.dock.setIcon(dockIcon);
+    } else {
+      const fallbackIcon = loadAppIcon("icon_512x512@2x.png");
+      if (!fallbackIcon.isEmpty()) {
+        app.dock.setIcon(fallbackIcon);
+      }
+    }
+  }
+
   const controller = createController();
   createTray(controller);
   controller.openSettings();
@@ -159,6 +231,10 @@ async function bootstrap() {
     return result.canceled ? null : result.filePaths[0];
   });
   ipcMain.handle("logs:load", () => loadLogs());
+  ipcMain.handle("logs:clear", () => {
+    clearLogs();
+    return loadLogs();
+  });
   ipcMain.handle("prompt:submit", (event, value: string | null) => {
     const resolver = pendingPromptResolvers.get(event.sender.id);
     if (resolver) {
@@ -197,6 +273,7 @@ async function bootstrap() {
 }
 
 app.whenReady().then(bootstrap);
+app.on("before-quit", clearDevHostState);
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

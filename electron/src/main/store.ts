@@ -17,27 +17,40 @@ export interface SharedPaths {
   settingsFile: string;
   backupSettingsFile: string;
   requestsDirectory: string;
+  templatesDirectory: string;
+  scriptsDirectory: string;
   logFile: string;
 }
 
 export function resolveSharedRoot(): string {
-  const groupContainer = path.join(os.homedir(), "Library", "Group Containers", APP_GROUP);
+  const appGroupIdentifier = process.env.APP_GROUP_IDENTIFIER?.trim() || APP_GROUP;
+  const groupContainer = path.join(os.homedir(), "Library", "Group Containers", appGroupIdentifier);
   if (fs.existsSync(groupContainer)) {
     return groupContainer;
   }
   return path.join(os.homedir(), "Library", "Application Support", APP_NAME);
 }
 
+export function resolveAppGroupIdentifier(): string {
+  return process.env.APP_GROUP_IDENTIFIER?.trim() || APP_GROUP;
+}
+
 export function getSharedPaths(): SharedPaths {
   const root = resolveSharedRoot();
   fs.mkdirSync(root, { recursive: true });
   const requestsDirectory = path.join(root, REQUESTS_DIR);
+  const templatesDirectory = path.join(root, "Templates");
+  const scriptsDirectory = path.join(root, "Scripts");
   fs.mkdirSync(requestsDirectory, { recursive: true });
+  fs.mkdirSync(templatesDirectory, { recursive: true });
+  fs.mkdirSync(scriptsDirectory, { recursive: true });
   return {
     root,
     settingsFile: path.join(root, SETTINGS_FILE),
     backupSettingsFile: path.join(root, SETTINGS_BACKUP_FILE),
     requestsDirectory,
+    templatesDirectory,
+    scriptsDirectory,
     logFile: path.join(root, LOG_FILE)
   };
 }
@@ -55,26 +68,25 @@ function decodeSettings(data: string): AppSettings | null {
 }
 
 export function normalizeSettings(settings: AppSettings): AppSettings {
+  const defaults = createDefaultSettings();
   const normalized = {
-    ...createDefaultSettings(),
+    ...defaults,
     ...settings,
     contextMenu: {
-      ...createDefaultSettings().contextMenu,
+      ...defaults.contextMenu,
       ...settings.contextMenu
     }
   };
   normalized.toolPreferences = settings.toolPreferences?.length
     ? settings.toolPreferences
-    : createDefaultSettings().toolPreferences;
-  normalized.contextMenu.categorySettings = settings.contextMenu?.categorySettings?.length
-    ? settings.contextMenu.categorySettings
-    : createDefaultSettings().contextMenu.categorySettings;
-  normalized.contextMenu.actionSettings = settings.contextMenu?.actionSettings?.length
-    ? settings.contextMenu.actionSettings
-    : createDefaultSettings().contextMenu.actionSettings;
+    : defaults.toolPreferences;
+  const existingCategorySettings = new Map((settings.contextMenu?.categorySettings ?? []).map((item) => [item.category, item]));
+  normalized.contextMenu.categorySettings = defaults.contextMenu.categorySettings.map((item) => existingCategorySettings.get(item.category) ?? item);
+  const existingActionSettings = new Map((settings.contextMenu?.actionSettings ?? []).map((item) => [item.actionID, item]));
+  normalized.contextMenu.actionSettings = defaults.contextMenu.actionSettings.map((item) => existingActionSettings.get(item.actionID) ?? item);
   normalized.aiActionVisibility = settings.aiActionVisibility?.length
     ? settings.aiActionVisibility
-    : createDefaultSettings().aiActionVisibility;
+    : defaults.aiActionVisibility;
   return normalized;
 }
 

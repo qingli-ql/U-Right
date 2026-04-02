@@ -5,6 +5,7 @@ CONFIG="${1:-Release}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_PATH="$ROOT/build/xcode/$CONFIG/U-Right.app"
 INSTALL_PATH="${APP_INSTALL_PATH:-/Applications/U-Right.app}"
+APP_GROUP_IDENTIFIER="${APP_GROUP_IDENTIFIER:-$("$ROOT/scripts/app_group_id.sh")}"
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister"
 PLUGINKIT="/usr/bin/pluginkit"
 DITTO="/usr/bin/ditto"
@@ -14,7 +15,7 @@ INSTALL_PLUGIN_PATH="$INSTALL_PATH/Contents/PlugIns/U-Right Finder Sync.appex"
 TMP_INSTALL_PATH="${INSTALL_PATH}.tmp.$$"
 
 if [[ ! -d "$APP_PATH" ]]; then
-  "$ROOT/scripts/build_app.sh" "$CONFIG"
+  APP_GROUP_IDENTIFIER="$APP_GROUP_IDENTIFIER" "$ROOT/scripts/build_app.sh" "$CONFIG"
 fi
 
 remove_registered_copy() {
@@ -53,3 +54,4 @@ fi
 "$LSREGISTER" -f -R "$INSTALL_PATH" >/dev/null 2>&1 || true
 
 echo "Installed to $INSTALL_PATH"
+echo "App Group identifier: $APP_GROUP_IDENTIFIER"

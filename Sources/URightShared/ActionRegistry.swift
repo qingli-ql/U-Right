@@ -111,6 +111,22 @@ public enum ActionCatalog {
     public static func definition(for id: String) -> ActionDefinition? {
         allDefinitions.first { $0.id == id }
     }
+
+    public static func title(for id: String) -> String {
+        if let definition = definition(for: id) {
+            return definition.title
+        }
+        if id.hasPrefix(ActionIDs.newFromTemplatePrefix) {
+            let templateID = String(id.dropFirst(ActionIDs.newFromTemplatePrefix.count))
+            if let template = BuiltInTemplates.all.first(where: { $0.id == templateID }) {
+                return template.title
+            }
+        }
+        if id.hasPrefix("script.run.") {
+            return String(id.dropFirst("script.run.".count))
+        }
+        return id
+    }
 }
 
 public enum ActionAvailabilityEvaluator {

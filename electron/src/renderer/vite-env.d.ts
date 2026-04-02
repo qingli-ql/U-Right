@@ -12,6 +12,7 @@ declare global {
       detectTools: () => Promise<Record<string, ToolAvailability>>;
       chooseDirectory: () => Promise<string | null>;
       loadLogs: () => Promise<LogEntry[]>;
+      clearLogs: () => Promise<LogEntry[]>;
       submitPrompt: (value: string | null) => Promise<void>;
       saveResult: (markdown: string, fileName?: string) => Promise<void>;
       applyResult: (markdown: string, filePath?: string | null) => Promise<void>;

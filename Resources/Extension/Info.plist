@@ -20,6 +20,8 @@
     <string>$(CURRENT_PROJECT_VERSION)</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
+    <key>URightAppGroupIdentifier</key>
+    <string>$(APP_GROUP_IDENTIFIER)</string>
     <key>NSExtension</key>
     <dict>
         <key>NSExtensionAttributes</key>

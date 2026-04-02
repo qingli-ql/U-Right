@@ -146,24 +146,36 @@ public struct AppSettings: Codable, Sendable {
     }
 
     public mutating func normalizeDerivedSettings() {
+        let defaultCategorySettings = ActionCatalog.categoryDefinitions.map {
+            MenuCategorySettings(
+                category: $0.category,
+                isEnabled: true,
+                order: $0.defaultOrder,
+                displayStyle: $0.defaultDisplayStyle
+            )
+        }
+        let defaultActionSettings = ActionCatalog.allDefinitions.map {
+            MenuActionSettings(
+                actionID: $0.id,
+                isEnabled: $0.defaultVisible,
+                categoryOverride: nil,
+                orderOverride: nil
+            )
+        }
         if contextMenu.categorySettings.isEmpty {
-            contextMenu.categorySettings = ActionCatalog.categoryDefinitions.map {
-                MenuCategorySettings(
-                    category: $0.category,
-                    isEnabled: true,
-                    order: $0.defaultOrder,
-                    displayStyle: $0.defaultDisplayStyle
-                )
+            contextMenu.categorySettings = defaultCategorySettings
+        } else {
+            let existingByCategory = Dictionary(uniqueKeysWithValues: contextMenu.categorySettings.map { ($0.category, $0) })
+            contextMenu.categorySettings = defaultCategorySettings.map { defaultSetting in
+                existingByCategory[defaultSetting.category] ?? defaultSetting
             }
         }
         if contextMenu.actionSettings.isEmpty {
-            contextMenu.actionSettings = ActionCatalog.allDefinitions.map {
-                MenuActionSettings(
-                    actionID: $0.id,
-                    isEnabled: $0.defaultVisible,
-                    categoryOverride: nil,
-                    orderOverride: nil
-                )
+            contextMenu.actionSettings = defaultActionSettings
+        } else {
+            let existingByActionID = Dictionary(uniqueKeysWithValues: contextMenu.actionSettings.map { ($0.actionID, $0) })
+            contextMenu.actionSettings = defaultActionSettings.map { defaultSetting in
+                existingByActionID[defaultSetting.actionID] ?? defaultSetting
             }
         }
         if toolPreferences.isEmpty {
@@ -256,9 +268,10 @@ public final class SettingsStore: @unchecked Sendable {
     private let currentDocumentVersion = 1
 
     public init(defaults: UserDefaults? = nil) {
-        let hasAppGroupContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: URightConstants.appGroupIdentifier) != nil
+        let appGroupIdentifier = URightConstants.appGroupIdentifier
+        let hasAppGroupContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) != nil
         if hasAppGroupContainer {
-            self.defaults = defaults ?? UserDefaults(suiteName: URightConstants.appGroupIdentifier)
+            self.defaults = defaults ?? UserDefaults(suiteName: appGroupIdentifier)
         } else {
             self.defaults = nil
         }
