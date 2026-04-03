@@ -100,6 +100,25 @@ function ensureFileNameWithExtension(name: string, fileExtension: string): strin
   return name.toLowerCase().endsWith(`.${fileExtension.toLowerCase()}`) ? name : `${name}.${fileExtension}`;
 }
 
+function parseNewFilePromptValue(rawValue: string): { fileName: string; templateID: string; body: string } {
+  const fallback = { fileName: "untitled", templateID: "empty", body: "" };
+  if (!rawValue) return fallback;
+  try {
+    const parsed = JSON.parse(rawValue) as Partial<{ fileName: string; templateID: string; body: string }>;
+    return {
+      fileName: parsed.fileName?.trim() || fallback.fileName,
+      templateID: parsed.templateID?.trim() || fallback.templateID,
+      body: parsed.body ?? ""
+    };
+  } catch {
+    return {
+      fileName: rawValue.trim() || fallback.fileName,
+      templateID: fallback.templateID,
+      body: ""
+    };
+  }
+}
+
 function nextDuplicatePath(target: string): string {
   const directory = path.dirname(target);
   const parsed = path.parse(target);
@@ -147,6 +166,9 @@ async function promptForValue(
     submitLabel?: string;
     variant?: "compact" | "full";
     placeholder?: string;
+    kind?: "default" | "new-file";
+    selectOptions?: string[];
+    defaultSelectOption?: string;
   }
 ): Promise<string | null> {
   return controller.openPrompt({
@@ -156,7 +178,10 @@ async function promptForValue(
     mode: options.mode ?? "singleline",
     submitLabel: options.submitLabel ?? "Continue",
     variant: options.variant ?? ((options.mode ?? "singleline") === "singleline" ? "compact" : "full"),
-    placeholder: options.placeholder
+    placeholder: options.placeholder,
+    kind: options.kind,
+    selectOptions: options.selectOptions,
+    defaultSelectOption: options.defaultSelectOption
   });
 }
 
@@ -188,7 +213,7 @@ function openEditor(target: string, tool: ToolKind) {
     return;
   }
   if (availability?.appPath) {
-    spawn("/usr/bin/open", ["-a", availability.appPath, target], { detached: true, stdio: "ignore" }).unref();
+    spawn("/usr/bin/open", ["-a", availability.appPath, "--args", target], { detached: true, stdio: "ignore" }).unref();
   }
 }
 
@@ -336,17 +361,37 @@ const directHandlers: Record<string, ActionHandler> = {
   "create.new-file": async (ctx) => {
     const directory = resolvedTargetDirectory(ctx.request.context) ?? directoryPath(ctx.request.context) ?? primaryPath(ctx.request.context);
     if (!directory || !await ensureWritableDirectory(directory)) return true;
+
+    const templateDefinitions = [BUILT_IN_EMPTY_TEMPLATE, ...getRuntimeTemplateDefinitions(ctx.settings)];
+    const templateSelectOptions = templateDefinitions.map((template) => `${template.id}|${template.title}`);
     const requested = await promptForValue(ctx.controller, {
-      title: BUILT_IN_EMPTY_TEMPLATE.title,
-      message: "输入文件名",
-      defaultValue: BUILT_IN_EMPTY_TEMPLATE.fileNameSuggestion,
-      variant: "compact"
+      title: "New File",
+      message: "选择类型、输入文件名并可直接写入内容",
+      defaultValue: JSON.stringify({
+        fileName: BUILT_IN_EMPTY_TEMPLATE.fileNameSuggestion,
+        templateID: BUILT_IN_EMPTY_TEMPLATE.id,
+        body: ""
+      }),
+      mode: "multiline",
+      submitLabel: "Create",
+      kind: "new-file",
+      selectOptions: templateSelectOptions,
+      defaultSelectOption: templateSelectOptions[0]
     });
     if (!requested) return true;
-    const sanitized = sanitizeFileName(requested);
+
+    const parsed = parseNewFilePromptValue(requested);
+    const template = templateDefinitions.find((item) => item.id === parsed.templateID) ?? BUILT_IN_EMPTY_TEMPLATE;
+    const sanitized = sanitizeFileName(parsed.fileName || template.fileNameSuggestion || BUILT_IN_EMPTY_TEMPLATE.fileNameSuggestion);
     if (!sanitized) return true;
-    const target = path.join(directory, sanitized);
-    fs.writeFileSync(target, "", "utf8");
+
+    const targetName = ensureFileNameWithExtension(sanitized, template.fileExtension);
+    const target = path.join(directory, targetName);
+    const content = parsed.body.length > 0 ? parsed.body : (template.starterContent ?? "");
+    fs.writeFileSync(target, content, "utf8");
+    if (template.makeExecutable) {
+      fs.chmodSync(target, 0o755);
+    }
     shell.showItemInFolder(target);
     return true;
   },
@@ -378,6 +423,20 @@ const directHandlers: Record<string, ActionHandler> = {
   "open.zed": async (ctx) => {
     const target = primaryPath(ctx.request.context) ?? directoryPath(ctx.request.context);
     if (target) openEditor(target, "zed");
+    return true;
+  },
+  "open.ghostty": async (ctx) => {
+    const directory = resolvedSelectionDirectory(ctx.request.context) ?? directoryPath(ctx.request.context) ?? primaryPath(ctx.request.context);
+    if (!directory) return true;
+    const availability = detectTools().ghostty;
+    if (availability?.appPath) {
+      spawn("/usr/bin/open", ["-a", availability.appPath, directory], { detached: true, stdio: "ignore" }).unref();
+      return true;
+    }
+    if (availability?.executablePath) {
+      spawn(availability.executablePath, ["--working-directory", directory], { detached: true, stdio: "ignore" }).unref();
+      return true;
+    }
     return true;
   },
   "finder.reveal": async (ctx) => {
@@ -428,6 +487,15 @@ const directHandlers: Record<string, ActionHandler> = {
   "file.json-format": async (ctx) => {
     const target = primaryPath(ctx.request.context);
     if (!target || !await ensureWritableFile(target)) return true;
+    const extension = path.extname(target).toLowerCase();
+    if (extension !== ".json") {
+      await dialog.showMessageBox({
+        type: "info",
+        title: "JSON Format",
+        message: "仅支持 .json 文件。"
+      });
+      return true;
+    }
     const content = fs.readFileSync(target, "utf8");
     fs.writeFileSync(target, `${JSON.stringify(JSON.parse(content), null, 2)}\n`, "utf8");
     return true;

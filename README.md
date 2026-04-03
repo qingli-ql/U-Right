@@ -113,3 +113,4 @@ make debug-unified-log
 - 默认开发入口：`make dev`
 - 默认权威安装路径：`/Applications/U-Right.app`
 - 菜单有问题时，先看 `docs/finder-sync-debugging.md`
+

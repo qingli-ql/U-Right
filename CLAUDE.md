@@ -8,6 +8,7 @@
 # Collaboration Style
 
 - For multi-file or architecture-heavy work, explore first, then plan, then implement.
+- For substantial work, prefer writing a short spec in `specs/` before coding.
 - Before major refactors, explain the module boundary impact and verification approach.
 - Keep explanations concise in Chinese unless deeper detail is requested.
 
@@ -32,6 +33,7 @@
 - For settings work, verify persistence and that both Host App and Extension can read the shared configuration.
 - For AI work, verify both CLI-present and CLI-missing paths.
 - For packaging work, verify the Electron app bundle, native extension embedding, code signing, and notarization path.
+- For multi-file features or refactors, record the intended scope, module ownership, and verification plan in `specs/`.
 - If build or test commands are not yet defined in the repo, inspect the project first and then document the commands you introduce.
 
 # Safety

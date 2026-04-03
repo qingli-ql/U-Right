@@ -143,6 +143,7 @@ export const ACTION_DEFINITIONS: ActionDefinition[] = [
   { id: "open.vscode", title: "Open in VS Code", systemImageName: "chevron.left.forwardslash.chevron.right", defaultCategory: "open", supportedContexts: ALL_SELECTION_KINDS, defaultOrder: 10, requiredTool: "vscode" },
   { id: "open.cursor", title: "Open in Cursor", systemImageName: "cursorarrow.rays", defaultCategory: "open", supportedContexts: ALL_SELECTION_KINDS, defaultOrder: 20, requiredTool: "cursor" },
   { id: "open.zed", title: "Open in Zed", systemImageName: "bolt.badge.a", defaultCategory: "open", supportedContexts: ALL_SELECTION_KINDS, defaultOrder: 30, requiredTool: "zed" },
+  { id: "open.ghostty", title: "Open in Ghostty", systemImageName: "terminal", defaultCategory: "open", supportedContexts: ALL_SELECTION_KINDS, defaultOrder: 40, requiredTool: "ghostty" },
   { id: "copy.path", title: "Copy Path", systemImageName: "document.on.document", defaultCategory: "clipboard", supportedContexts: ALL_SELECTION_KINDS, defaultOrder: 0 },
   { id: "copy.relative-path", title: "Copy Relative Path", systemImageName: "arrowshape.turn.up.backward.2", defaultCategory: "clipboard", supportedContexts: ["file", "folder", "multi"], defaultOrder: 10, implementationStatus: "beta" },
   { id: "copy.filename", title: "Copy Filename", systemImageName: "textformat.characters", defaultCategory: "clipboard", supportedContexts: ["file"], defaultOrder: 20, implementationStatus: "implemented", defaultVisible: true },
@@ -219,7 +220,10 @@ export function getUserTemplates(settings: AppSettings): UserTemplateItem[] {
 }
 
 export function getRuntimeTemplateDefinitions(settings: AppSettings): RuntimeTemplateDefinition[] {
-  const builtins: RuntimeTemplateDefinition[] = Object.entries(BUILT_IN_TEMPLATE_TITLES).map(([id, title]) => ({
+  const hiddenBuiltInTemplateIDs = new Set(getTemplateSettings(settings).hiddenBuiltInTemplateIDs ?? []);
+  const builtins: RuntimeTemplateDefinition[] = Object.entries(BUILT_IN_TEMPLATE_TITLES)
+    .filter(([id]) => !hiddenBuiltInTemplateIDs.has(id))
+    .map(([id, title]) => ({
     id,
     title,
     fileNameSuggestion:

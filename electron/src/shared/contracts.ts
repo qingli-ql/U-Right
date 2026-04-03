@@ -85,6 +85,7 @@ export interface TemplateSettings {
   customTemplateFolder: string;
   userTemplates: UserTemplateItem[];
   extensionDefaults: ExtensionTemplateDefault[];
+  hiddenBuiltInTemplateIDs: string[];
 }
 
 export interface AIProfile {
@@ -252,6 +253,9 @@ export interface PromptWindowPayload {
   placeholder?: string;
   confirmLabel?: string;
   isDestructive?: boolean;
+  kind?: "default" | "new-file";
+  selectOptions?: string[];
+  defaultSelectOption?: string;
 }
 
 export interface ResultWindowPayload {

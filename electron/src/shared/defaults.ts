@@ -81,7 +81,8 @@ export function createDefaultSettings(): AppSettings {
     templates: {
       customTemplateFolder: "",
       userTemplates: [],
-      extensionDefaults: []
+      extensionDefaults: [],
+      hiddenBuiltInTemplateIDs: ["css", "javascript", "typescript"]
     },
     ai: {
       enabled: true,

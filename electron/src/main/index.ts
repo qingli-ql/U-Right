@@ -260,7 +260,6 @@ async function bootstrap() {
 
   const controller = createController();
   createTray(controller);
-  controller.openSettings();
   startRequestWatcher(controller);
 
   ipcMain.handle("window:get-context", (event) => {

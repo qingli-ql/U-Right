@@ -1332,21 +1332,42 @@ function buildActualMenuDiff(
 function PromptView({ payload }: { payload: PromptWindowPayload }) {
   const api = getUrightAPI();
   const [value, setValue] = useState(payload.defaultValue);
+  const [selectedOption, setSelectedOption] = useState(payload.defaultSelectOption ?? payload.selectOptions?.[0] ?? "");
   const isCompact = payload.variant === "compact" && payload.mode === "singleline";
+  const isNewFilePrompt = payload.kind === "new-file";
 
   function submit(nextValue: string | null) {
     void api.submitPrompt(nextValue);
   }
 
+  function buildSubmitValue(rawValue: string): string {
+    if (!isNewFilePrompt) {
+      return rawValue;
+    }
+    const parsed = (() => {
+      try {
+        return JSON.parse(rawValue) as Partial<{ fileName: string; templateID: string; body: string }>;
+      } catch {
+        return { fileName: rawValue, templateID: "empty", body: "" } as Partial<{ fileName: string; templateID: string; body: string }>;
+      }
+    })();
+    const [templateID] = (selectedOption || "empty").split("|");
+    return JSON.stringify({
+      fileName: (parsed.fileName ?? "").trim(),
+      templateID: templateID || "empty",
+      body: parsed.body ?? ""
+    });
+  }
+
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
       event.preventDefault();
-      submit(value);
+      submit(buildSubmitValue(value));
       return;
     }
     if (payload.mode === "singleline" && event.key === "Enter") {
       event.preventDefault();
-      submit(value);
+      submit(buildSubmitValue(value));
       return;
     }
     if (event.key === "Escape") {
@@ -1384,6 +1405,17 @@ function PromptView({ payload }: { payload: PromptWindowPayload }) {
         <p className="eyebrow">{payload.mode === "multiline" ? "Prompt Composer" : "Confirmation Path"}</p>
         <h2>{payload.title}</h2>
         <p className="lede">{payload.message}</p>
+        {isNewFilePrompt && payload.selectOptions?.length ? (
+          <label>
+            File type
+            <select value={selectedOption} onChange={(event) => setSelectedOption(event.target.value)}>
+              {payload.selectOptions.map((option) => {
+                const [id, label] = option.split("|");
+                return <option key={option} value={option}>{label || id}</option>;
+              })}
+            </select>
+          </label>
+        ) : null}
         {payload.mode === "multiline" ? (
           <textarea className="prompt-area" value={value} onChange={(event) => setValue(event.target.value)} onKeyDown={onKeyDown} rows={18} />
         ) : (
@@ -1391,7 +1423,7 @@ function PromptView({ payload }: { payload: PromptWindowPayload }) {
         )}
         <div className="footer-bar">
           <button className="secondary-button" onClick={() => submit(null)}>Cancel</button>
-          <button className="primary-button" onClick={() => submit(value)}>{payload.submitLabel}</button>
+          <button className="primary-button" onClick={() => submit(buildSubmitValue(value))}>{payload.submitLabel}</button>
         </div>
       </div>
     </Shell>
