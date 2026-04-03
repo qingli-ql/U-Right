@@ -39,6 +39,17 @@ final class ExternalToolService {
         try runDetached(executable: "/bin/zsh", arguments: [url.path], currentDirectory: workingDirectory)
     }
 
+    func openWithApplication(at appPath: String, urls: [URL]) throws {
+        guard !urls.isEmpty else {
+            throw HostCommandError.invalidContext("没有可打开的目标")
+        }
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.activates = true
+        let applicationURL = URL(fileURLWithPath: appPath)
+        Logger.shared.info("tools", "NSWorkspace open custom-app=\(applicationURL.path) targetCount=\(urls.count)")
+        NSWorkspace.shared.open(urls, withApplicationAt: applicationURL, configuration: configuration)
+    }
+
     private func openEditor(tool: ToolKind, urls: [URL], tools: [ToolKind: ToolAvailability]) throws {
         if let cli = tools[tool]?.executablePath {
             Logger.shared.info("tools", "Opening editor via CLI tool=\(tool.rawValue) cli=\(cli) firstTarget=\(urls.first?.path ?? "-")")

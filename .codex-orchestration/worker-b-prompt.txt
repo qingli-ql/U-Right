@@ -1,0 +1,24 @@
+你是 Worker B，负责 Track B：为 Finder 视图动作补实现底座。先阅读以下文档和代码，再直接做实现：
+- docs/project-progress.md
+- docs/action-implementation-status.md
+- docs/product-planning-settings-contextmenu-ai.md
+- docs/context-menu-mvp-implementation.md
+- AGENTS.md
+
+你的唯一写入范围：
+- electron/src/main/finder-view-actions.ts
+
+任务目标：
+1. 新增一个清晰、可复用的 Electron 主进程辅助模块，用于承载 Finder 相关视图动作能力
+2. 至少实现可被主进程调用的两个函数：一个用于刷新 Finder 窗口，一个用于切换指定目录的隐藏文件显示
+3. 设计 API 时考虑当前项目约束：Finder Extension 薄、Electron Host 执行复杂动作、后续 action runner 易接入
+4. 尽量使用 macOS 原生命令或 AppleScript/JXA 等系统能力，但接口要清晰，返回结构要便于结果提示/报错
+5. 不要修改其它文件；主控之后会负责接入调用
+
+注意：你不是单独在代码库里工作，别回滚别人的改动；只改你负责的新文件。
+
+完成后请给出：
+- 改了哪些文件
+- 导出了哪些 API
+- 接入方应如何调用
+- 哪些地方你觉得主控还需要补

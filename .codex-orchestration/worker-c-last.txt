@@ -1,0 +1,20 @@
+**已修改文件**
+- `docs/implementation-tracks.md:1`
+- `docs/manual-validation-checklist.md:1`
+
+**每个文档解决的问题**
+- `docs/implementation-tracks.md:1`
+  - 把本轮并行开发拆成 Track A/B/C/D，明确了各自目标、边界、依赖、可并行关系和验收条件。
+  - 解决“多人并行时谁负责什么、哪些地方会互相卡住、最终怎么对齐”的问题。
+- `docs/manual-validation-checklist.md:1`
+  - 给出一份可直接执行的最小手动回归清单，覆盖 Finder 文件/文件夹/多选/空白区域，以及本轮补动作、设置、AI 的关键回归点。
+  - 解决“实现完以后怎么快速验真、怎么判断能不能交付”的问题。
+
+**主控最终汇总如何引用**
+- 汇总并行推进方式时，直接引用 `docs/implementation-tracks.md:1`，说明四条轨道的职责划分、依赖关系和合并顺序。
+- 汇总验证与交付状态时，直接引用 `docs/manual-validation-checklist.md:1`，把它作为本轮最小回归基线和阻塞判定依据。
+- 若要写最终 release / iteration summary，建议结构是：
+  - “实现分工与边界” → 引 `docs/implementation-tracks.md:1`
+  - “最小回归与验收口径” → 引 `docs/manual-validation-checklist.md:1`
+
+未改其它文件，也没有回滚别人的内容。

@@ -20,6 +20,35 @@ if [[ ! -f "$MASTER_PNG" ]]; then
   exit 1
 fi
 
+python3 - <<'PY' "$MASTER_PNG"
+from collections import deque
+from PIL import Image
+import sys
+
+path = sys.argv[1]
+img = Image.open(path).convert("RGBA")
+pixels = img.load()
+width, height = img.size
+visited = set()
+queue = deque([(0, 0), (width - 1, 0), (0, height - 1), (width - 1, height - 1)])
+
+def is_background(pixel):
+    r, g, b, a = pixel
+    return a > 0 and r >= 245 and g >= 245 and b >= 245
+
+while queue:
+    x, y = queue.popleft()
+    if (x, y) in visited or x < 0 or y < 0 or x >= width or y >= height:
+        continue
+    visited.add((x, y))
+    if not is_background(pixels[x, y]):
+        continue
+    pixels[x, y] = (255, 255, 255, 0)
+    queue.extend(((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)))
+
+img.save(path)
+PY
+
 render_one() {
   local output_name="$1"
   local size="$2"

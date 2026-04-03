@@ -3,7 +3,7 @@ import path from "node:path";
 import fs from "node:fs";
 import type { AppSettings, PromptWindowPayload, ResultWindowPayload, WindowContextPayload } from "../shared/contracts";
 import { getUrightBrandDataURL } from "../shared/brand";
-import { loadSettings, saveSettings, getSharedPaths } from "./store";
+import { loadAppDiagnostics, loadFinderMenuSnapshot, loadPreviousSettingsSnapshot, loadSettings, restorePreviousSettings, saveSettings, getSharedPaths } from "./store";
 import { detectTools } from "./tool-detection";
 import { clearLogs, loadLogs } from "./logs";
 import { startRequestWatcher } from "./request-watcher";
@@ -77,7 +77,12 @@ function rendererURL() {
   return `file://${path.join(__dirname, "../../renderer/index.html")}`;
 }
 
-function createWindow(kind: WindowKind, size: { width: number; height: number }, payload: WindowContextPayload): BrowserWindow {
+function createWindow(
+  kind: WindowKind,
+  size: { width: number; height: number },
+  payload: WindowContextPayload,
+  minSize?: { width: number; height: number }
+): BrowserWindow {
   const preloadPath = path.join(__dirname, "preload.js");
   if (!fs.existsSync(preloadPath)) {
     throw new Error(`Electron preload bundle is missing: ${preloadPath}`);
@@ -86,6 +91,8 @@ function createWindow(kind: WindowKind, size: { width: number; height: number },
   const window = new BrowserWindow({
     width: size.width,
     height: size.height,
+    minWidth: minSize?.width ?? size.width,
+    minHeight: minSize?.height ?? size.height,
     title: "",
     backgroundColor: "#f6efe2",
     titleBarStyle: "hidden",
@@ -98,20 +105,32 @@ function createWindow(kind: WindowKind, size: { width: number; height: number },
       nodeIntegration: false
     }
   });
-  windowState.set(window.webContents.id, payload);
-  window.webContents.on("did-finish-load", () => {
-    console.log(`[uright main] window=${kind} finished load url=${window.webContents.getURL()}`);
+  const webContents = window.webContents;
+  windowState.set(webContents.id, payload);
+  webContents.on("did-finish-load", () => {
+    if (webContents.isDestroyed()) {
+      return;
+    }
+    console.log(`[uright main] window=${kind} finished load url=${webContents.getURL()}`);
   });
-  window.webContents.on("did-fail-load", (_event, code, description, validatedURL) => {
+  webContents.on("did-fail-load", (_event, code, description, validatedURL) => {
     console.error(`[uright main] window=${kind} failed load code=${code} description=${description} url=${validatedURL}`);
   });
-  window.webContents.on("console-message", (_event, level, message, line, sourceId) => {
+  webContents.on("console-message", (_event, level, message, line, sourceId) => {
     console.log(`[uright renderer:${kind}] level=${level} ${sourceId}:${line} ${message}`);
   });
-  window.webContents.on("render-process-gone", (_event, details) => {
+  webContents.on("render-process-gone", (_event, details) => {
     console.error(`[uright main] window=${kind} render process gone reason=${details.reason} exitCode=${details.exitCode}`);
   });
-  window.once("ready-to-show", () => window.show());
+  window.once("ready-to-show", () => {
+    if (!window.isDestroyed()) {
+      window.show();
+    }
+  });
+  window.on("closed", () => {
+    windowState.delete(webContents.id);
+    pendingPromptResolvers.delete(webContents.id);
+  });
   const url = rendererURL();
   if (url.startsWith("file://")) {
     void window.loadURL(`${url}?window=${kind}`);
@@ -153,46 +172,71 @@ function createController(): WindowController {
   return {
     openSettings() {
       if (!settingsWindow || settingsWindow.isDestroyed()) {
-        settingsWindow = createWindow("settings", { width: 1320, height: 860 }, { kind: "settings" });
+        settingsWindow = createWindow("settings", { width: 1320, height: 860 }, { kind: "settings" }, { width: 960, height: 620 });
       }
-      settingsWindow.show();
-      settingsWindow.focus();
+      if (!settingsWindow.isDestroyed()) {
+        settingsWindow.show();
+        settingsWindow.focus();
+      }
       return settingsWindow;
     },
     openLogs() {
       if (!logsWindow || logsWindow.isDestroyed()) {
-        logsWindow = createWindow("logs", { width: 980, height: 700 }, { kind: "logs" });
+        logsWindow = createWindow("logs", { width: 980, height: 700 }, { kind: "logs" }, { width: 820, height: 520 });
       }
-      logsWindow.show();
-      logsWindow.focus();
+      if (!logsWindow.isDestroyed()) {
+        logsWindow.show();
+        logsWindow.focus();
+      }
       return logsWindow;
     },
     openOnboarding() {
       if (!onboardingWindow || onboardingWindow.isDestroyed()) {
-        onboardingWindow = createWindow("onboarding", { width: 760, height: 640 }, { kind: "onboarding" });
+        onboardingWindow = createWindow("onboarding", { width: 760, height: 640 }, { kind: "onboarding" }, { width: 680, height: 520 });
       }
-      onboardingWindow.show();
-      onboardingWindow.focus();
+      if (!onboardingWindow.isDestroyed()) {
+        onboardingWindow.show();
+        onboardingWindow.focus();
+      }
       return onboardingWindow;
     },
     openPrompt(payload) {
       return new Promise((resolve) => {
-        const promptWindow = createWindow("prompt", { width: 860, height: payload.mode === "multiline" ? 700 : 380 }, { kind: "prompt", prompt: payload });
-        pendingPromptResolvers.set(promptWindow.webContents.id, resolve);
+        const promptSize =
+          payload.mode === "multiline"
+            ? { width: 860, height: 700 }
+            : payload.variant === "compact"
+              ? { width: 460, height: 228 }
+              : { width: 860, height: 380 };
+        const promptWindow = createWindow(
+          "prompt",
+          promptSize,
+          { kind: "prompt", prompt: payload },
+          payload.mode === "multiline"
+            ? { width: 720, height: 520 }
+            : payload.variant === "compact"
+              ? { width: 420, height: 208 }
+              : { width: 720, height: 300 }
+        );
+        promptWindow.setResizable(payload.mode === "multiline");
+        promptWindow.setMinimizable(false);
+        promptWindow.setMaximizable(false);
+        const promptWebContentsID = promptWindow.webContents.id;
+        pendingPromptResolvers.set(promptWebContentsID, resolve);
         promptWindow.on("closed", () => {
-          const pending = pendingPromptResolvers.get(promptWindow.webContents.id);
+          const pending = pendingPromptResolvers.get(promptWebContentsID);
           if (pending) {
             pending(null);
-            pendingPromptResolvers.delete(promptWindow.webContents.id);
+            pendingPromptResolvers.delete(promptWebContentsID);
           }
         });
       });
     },
     openResult(payload) {
-      return createWindow("result", { width: 1040, height: 780 }, { kind: "result", result: payload });
+      return createWindow("result", { width: 1040, height: 780 }, { kind: "result", result: payload }, { width: 860, height: 560 });
     },
     appendResult(window, chunk) {
-      if (!window.isDestroyed()) {
+      if (!window.isDestroyed() && !window.webContents.isDestroyed()) {
         window.webContents.send("result:append", chunk);
       }
     }
@@ -225,9 +269,21 @@ async function bootstrap() {
 
   ipcMain.handle("settings:load", () => loadSettings());
   ipcMain.handle("settings:save", (_event, settings: AppSettings) => saveSettings(settings));
+  ipcMain.handle("settings:load-previous", () => loadPreviousSettingsSnapshot());
+  ipcMain.handle("settings:restore-previous", () => restorePreviousSettings());
+  ipcMain.handle("diagnostics:load", () => loadAppDiagnostics());
+  ipcMain.handle("settings:diagnostics", () => loadAppDiagnostics());
+  ipcMain.handle("finder:snapshot", () => loadFinderMenuSnapshot());
   ipcMain.handle("tools:detect", () => detectTools());
   ipcMain.handle("dialog:choose-directory", async () => {
     const result = await dialog.showOpenDialog({ properties: ["openDirectory"] });
+    return result.canceled ? null : result.filePaths[0];
+  });
+  ipcMain.handle("dialog:choose-app", async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ["openFile"],
+      filters: [{ name: "Applications", extensions: ["app"] }]
+    });
     return result.canceled ? null : result.filePaths[0];
   });
   ipcMain.handle("logs:load", () => loadLogs());

@@ -10,7 +10,8 @@ public final class ToolDetector: @unchecked Sendable {
     public func detect(settings: AppSettings = SettingsStore.shared.load()) -> [ToolKind: ToolAvailability] {
         var results: [ToolKind: ToolAvailability] = [:]
         for kind in ToolKind.allCases {
-            let customPath = settings.customExecutablePaths[kind.rawValue]
+            let customPath = settings.integrations.customExecutablePaths[kind.rawValue].flatMap { $0.isEmpty ? nil : $0 }
+                ?? settings.customExecutablePaths[kind.rawValue]
             let executablePath = customPath?.isEmpty == false ? customPath : executablePath(for: kind)
             let appPath = applicationPath(for: kind)
             let installed = executablePath != nil || appPath != nil
@@ -34,8 +35,8 @@ public final class ToolDetector: @unchecked Sendable {
         case .gitup: ["gitup"]
         }
         for name in names {
-            if let path = lookupBinary(named: name) {
-                return path
+            if let resolvedPath = lookupBinary(named: name) {
+                return resolvedPath
             }
         }
         return nil
@@ -51,10 +52,15 @@ public final class ToolDetector: @unchecked Sendable {
         case .zed: ["Zed.app"]
         case .claude: ["Claude.app"]
         case .codex: ["Codex.app"]
-        case .gh, .lazygit, .gitup: ["GitUp.app"]
+        case .gh, .lazygit: []
+        case .gitup: ["GitUp.app"]
         }
         let searchRoots = [
             URL(fileURLWithPath: "/Applications", isDirectory: true),
+            URL(fileURLWithPath: "/Applications/Utilities", isDirectory: true),
+            URL(fileURLWithPath: "/Applications/Setapp", isDirectory: true),
+            URL(fileURLWithPath: "/System/Applications", isDirectory: true),
+            URL(fileURLWithPath: "/System/Applications/Utilities", isDirectory: true),
             fileManager.homeDirectoryForCurrentUser.appendingPathComponent("Applications", isDirectory: true)
         ]
         for appName in appNames {
@@ -80,6 +86,7 @@ public final class ToolDetector: @unchecked Sendable {
         case "Zed.app": return "dev.zed.Zed"
         case "Claude.app": return "com.anthropic.claudedesktop"
         case "Codex.app": return "com.openai.codex"
+        case "GitUp.app": return "com.gitup.mac"
         default: return "com.apple.Terminal"
         }
     }
@@ -92,13 +99,44 @@ public final class ToolDetector: @unchecked Sendable {
                 return candidate.path
             }
         }
-        let common = ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin"]
+        let common = [
+            "/opt/homebrew/bin",
+            "/opt/homebrew/sbin",
+            "/usr/local/bin",
+            "/usr/local/sbin",
+            "/usr/bin",
+            "/bin",
+            fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".local/bin").path,
+            fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".bun/bin").path
+        ]
         for directory in common {
             let candidate = URL(fileURLWithPath: directory).appendingPathComponent(name)
             if fileManager.isExecutableFile(atPath: candidate.path) {
                 return candidate.path
             }
         }
+        if let shellPath = lookupBinaryInLoginShell(named: name) {
+            return shellPath
+        }
         return nil
+    }
+
+    private func lookupBinaryInLoginShell(named name: String) -> String? {
+        let process = Process()
+        let output = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-lc", "command -v \(name)"]
+        process.standardOutput = output
+        process.standardError = Pipe()
+        do {
+            try process.run()
+            process.waitUntilExit()
+            guard process.terminationStatus == 0 else { return nil }
+            let data = output.fileHandleForReading.readDataToEndOfFile()
+            let value = String(decoding: data, as: UTF8.self).trimmingCharacters(in: .whitespacesAndNewlines)
+            return value.isEmpty ? nil : value
+        } catch {
+            return nil
+        }
     }
 }

@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { AppSettings, PromptWindowPayload, ResultWindowPayload, ToolAvailability, WindowContextPayload } from "../shared/contracts";
+import type { AppDiagnostics, AppSettings, FinderMenuSnapshot, PromptWindowPayload, ResultWindowPayload, SettingsHistorySnapshot, ToolAvailability, WindowContextPayload } from "../shared/contracts";
 import type { LogEntry } from "./types";
 
 console.log("[uright preload] starting");
@@ -8,8 +8,13 @@ contextBridge.exposeInMainWorld("uright", {
   getWindowContext: () => ipcRenderer.invoke("window:get-context") as Promise<WindowContextPayload>,
   loadSettings: () => ipcRenderer.invoke("settings:load") as Promise<AppSettings>,
   saveSettings: (settings: AppSettings) => ipcRenderer.invoke("settings:save", settings) as Promise<AppSettings>,
+  loadPreviousSettings: () => ipcRenderer.invoke("settings:load-previous") as Promise<SettingsHistorySnapshot | null>,
+  restorePreviousSettings: () => ipcRenderer.invoke("settings:restore-previous") as Promise<SettingsHistorySnapshot | null>,
+  loadDiagnostics: () => ipcRenderer.invoke("settings:diagnostics") as Promise<AppDiagnostics>,
+  loadFinderSnapshot: () => ipcRenderer.invoke("finder:snapshot") as Promise<FinderMenuSnapshot | null>,
   detectTools: () => ipcRenderer.invoke("tools:detect") as Promise<Record<string, ToolAvailability>>,
   chooseDirectory: () => ipcRenderer.invoke("dialog:choose-directory") as Promise<string | null>,
+  chooseApp: () => ipcRenderer.invoke("dialog:choose-app") as Promise<string | null>,
   loadLogs: () => ipcRenderer.invoke("logs:load") as Promise<LogEntry[]>,
   clearLogs: () => ipcRenderer.invoke("logs:clear") as Promise<LogEntry[]>,
   submitPrompt: (value: string | null) => ipcRenderer.invoke("prompt:submit", value) as Promise<void>,

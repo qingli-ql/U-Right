@@ -1,0 +1,26 @@
+你是 Worker A，负责 Track A：补齐高频剪贴板动作。先阅读以下文档和代码，再直接实现，不要停留在建议层：
+- docs/project-progress.md
+- docs/action-implementation-status.md
+- docs/product-planning-settings-contextmenu-ai.md
+- docs/context-menu-mvp-implementation.md
+- AGENTS.md
+
+你的唯一写入范围：
+- electron/src/main/action-runner.ts
+- electron/src/shared/action-registry.ts
+- Sources/URightShared/ActionRegistry.swift
+
+任务目标：
+1. 实现 `copy.filename`、`copy.basename`、`copy.extension`
+2. 保证 Finder 菜单 / Settings Preview / Electron executor 状态一致
+3. 对这 3 个动作把实现状态从 planned 改为 implemented 或 beta，并根据你的实现决定 defaultVisible 是否应开启；要与当前“已完成动作才默认暴露”的原则一致
+4. 保持路径归一化与多选/文件上下文规则合理，不要破坏现有动作
+5. 不要改动你范围之外的文件
+
+注意：你不是单独在代码库里工作，别回滚别人的改动；如果发现别人可能会改相邻逻辑，请只在你负责文件内最小修改并适配现状。
+
+完成后请给出：
+- 改了哪些文件
+- 具体实现了什么
+- 你建议主控重点复查什么
+- 是否还有未完成边角

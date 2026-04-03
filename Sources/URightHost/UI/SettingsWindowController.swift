@@ -6,18 +6,20 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
     private enum Section: CaseIterable {
         case general
         case contextMenu
-        case tools
+        case integrations
         case ai
         case templates
+        case customActions
         case advanced
 
         var title: String {
             switch self {
             case .general: return "General"
             case .contextMenu: return "Context Menu"
-            case .tools: return "Tools"
+            case .integrations: return "Integrations"
             case .ai: return "AI"
             case .templates: return "Templates"
+            case .customActions: return "Custom Actions"
             case .advanced: return "Advanced"
             }
         }
@@ -26,9 +28,10 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
             switch self {
             case .general: return "gearshape"
             case .contextMenu: return "list.bullet.rectangle.portrait"
-            case .tools: return "wrench.and.screwdriver"
+            case .integrations: return "wrench.and.screwdriver"
             case .ai: return "sparkles"
             case .templates: return "doc.badge.plus"
+            case .customActions: return "app.badge"
             case .advanced: return "slider.horizontal.3"
             }
         }
@@ -65,6 +68,8 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
     private let templateFolder = NSTextField(string: "")
     private let customPaths = NSTextView()
     private let aiActionsField = NSTextField(string: "")
+    private let templateSummaryView = NSTextView()
+    private let customActionsSummaryView = NSTextView()
 
     private let categoryTable = NSTableView()
     private let actionTable = NSTableView()
@@ -96,7 +101,7 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
 
     private var actionsForSelectedCategory: [ActionDefinition] {
         guard let category = selectedCategory else { return [] }
-        return ActionCatalog.allDefinitions
+        return ActionCatalog.runtimeDefinitions(settings: settings)
             .filter { ActionAvailabilityEvaluator.resolvedCategory(for: $0, settings: settings) == category }
             .sorted { ActionAvailabilityEvaluator.resolvedOrder(for: $0, settings: settings) < ActionAvailabilityEvaluator.resolvedOrder(for: $1, settings: settings) }
     }
@@ -161,9 +166,10 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
         sectionViews = [
             .general: generalView(),
             .contextMenu: contextMenuView(),
-            .tools: toolsView(),
+            .integrations: integrationsView(),
             .ai: aiView(),
             .templates: templatesView(),
+            .customActions: customActionsView(),
             .advanced: advancedView()
         ]
 
@@ -298,9 +304,7 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
         form([
             launchAtLogin,
             showMenuBarIcon,
-            showExtensionStatus,
-            labeled("Default terminal", defaultTerminal),
-            labeled("Default editor", defaultEditor)
+            showExtensionStatus
         ])
     }
 
@@ -351,9 +355,11 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
         return wrapFill(split)
     }
 
-    private func toolsView() -> NSView {
+    private func integrationsView() -> NSView {
         configureTable(toolTable, tag: .tools, title: "Tools")
         let details = NSStackView(views: [
+            labeled("Default terminal", defaultTerminal),
+            labeled("Default editor", defaultEditor),
             toolStatusLabel,
             toolAllowActions,
             labeled("Custom path", toolCustomPath),
@@ -364,12 +370,16 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
         ])
         details.orientation = .vertical
         details.spacing = 8
+        let rawPathsScroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 560, height: 180))
+        customPaths.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        rawPathsScroll.documentView = customPaths
+        rawPathsScroll.hasVerticalScroller = true
         let split = NSSplitView()
         split.dividerStyle = .thin
         split.translatesAutoresizingMaskIntoConstraints = false
         split.isVertical = true
         split.addArrangedSubview(pane(title: "Tool List", body: [tableScrollView(toolTable)]))
-        split.addArrangedSubview(pane(title: "Details", body: [details]))
+        split.addArrangedSubview(pane(title: "Details", body: [details, labeled("Raw executable path overrides", rawPathsScroll)]))
         return wrapFill(split)
     }
 
@@ -390,20 +400,26 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
     }
 
     private func templatesView() -> NSView {
-        form([
+        templateSummaryView.isEditable = false
+        templateSummaryView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
+        return form([
             labeled("Custom template folder", templateFolder),
+            labeled("Active runtime templates", scrollTextView(templateSummaryView)),
             NSButton(title: "Reload Templates", target: self, action: #selector(reloadTemplates))
         ])
     }
 
-    private func advancedView() -> NSView {
-        let scroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 560, height: 180))
-        customPaths.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
-        scroll.documentView = customPaths
-        scroll.hasVerticalScroller = true
+    private func customActionsView() -> NSView {
+        customActionsSummaryView.isEditable = false
+        customActionsSummaryView.font = .monospacedSystemFont(ofSize: 12, weight: .regular)
         return form([
-            debugLogging,
-            labeled("Custom executable paths", scroll)
+            labeled("Custom open actions synced from settings", scrollTextView(customActionsSummaryView))
+        ])
+    }
+
+    private func advancedView() -> NSView {
+        return form([
+            debugLogging
         ])
     }
 
@@ -503,24 +519,26 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
     private func loadValues() {
         settings = SettingsStore.shared.load()
         detectedTools = ToolDetector.shared.detect(settings: settings)
-        launchAtLogin.state = settings.launchAtLogin ? .on : .off
-        showMenuBarIcon.state = settings.showMenuBarIcon ? .on : .off
-        showExtensionStatus.state = settings.showExtensionStatus ? .on : .off
-        aiEnabled.state = settings.aiEnabled ? .on : .off
-        includeHidden.state = settings.includeHiddenFiles ? .on : .off
-        debugLogging.state = settings.debugLogging ? .on : .off
-        defaultTerminal.selectItem(withTitle: settings.defaultTerminal.rawValue)
-        defaultEditor.selectItem(withTitle: settings.defaultEditor.rawValue)
-        preferredProvider.selectItem(withTitle: settings.preferredAIProvider.rawValue)
-        apiBaseURL.stringValue = settings.apiBaseURL
-        apiKey.stringValue = settings.apiKey
-        apiModel.stringValue = settings.apiModel
-        systemPrompt.stringValue = settings.systemPromptTemplate
-        maxFileSize.stringValue = String(settings.maxContextFileSize)
-        maxDepth.stringValue = String(settings.maxFolderScanDepth)
-        templateFolder.stringValue = settings.customTemplateFolder
-        customPaths.string = settings.customExecutablePaths.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
-        aiActionsField.stringValue = settings.aiActionVisibility.joined(separator: ", ")
+        launchAtLogin.state = settings.general.launchAtLogin ? .on : .off
+        showMenuBarIcon.state = settings.general.showMenuBarIcon ? .on : .off
+        showExtensionStatus.state = settings.general.showExtensionStatus ? .on : .off
+        aiEnabled.state = settings.ai.enabled ? .on : .off
+        includeHidden.state = activePromptPolicy().includeHiddenFiles ? .on : .off
+        debugLogging.state = settings.advanced.debugLogging ? .on : .off
+        defaultTerminal.selectItem(withTitle: settings.integrations.defaultTerminal.rawValue)
+        defaultEditor.selectItem(withTitle: settings.integrations.defaultEditor.rawValue)
+        preferredProvider.selectItem(withTitle: settings.ai.preferredProvider.rawValue)
+        apiBaseURL.stringValue = activeAIProfile().apiBaseURL
+        apiKey.stringValue = activeAIProfile().apiKey
+        apiModel.stringValue = activeAIProfile().apiModel
+        systemPrompt.stringValue = activePromptPolicy().systemPromptTemplate
+        maxFileSize.stringValue = String(activePromptPolicy().maxContextFileSize)
+        maxDepth.stringValue = String(activePromptPolicy().maxFolderScanDepth)
+        templateFolder.stringValue = settings.templates.customTemplateFolder
+        customPaths.string = settings.integrations.customExecutablePaths.map { "\($0.key)=\($0.value)" }.sorted().joined(separator: "\n")
+        aiActionsField.stringValue = settings.ai.actionVisibility.joined(separator: ", ")
+        templateSummaryView.string = runtimeTemplateSummary()
+        customActionsSummaryView.string = customOpenActionsSummary()
         showUnavailableInPreview.state = settings.contextMenu.showUnavailableInPreview ? .on : .off
         collapseSingleGroups.state = settings.contextMenu.collapseSingleActionGroups ? .on : .off
         categoryTable.reloadData()
@@ -536,35 +554,38 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
     }
 
     @objc private func saveSettings() {
-        settings.launchAtLogin = launchAtLogin.state == .on
-        settings.showMenuBarIcon = showMenuBarIcon.state == .on
-        settings.showExtensionStatus = showExtensionStatus.state == .on
-        settings.aiEnabled = aiEnabled.state == .on
-        settings.includeHiddenFiles = includeHidden.state == .on
-        settings.debugLogging = debugLogging.state == .on
-        settings.defaultTerminal = ToolKind(rawValue: defaultTerminal.titleOfSelectedItem ?? "terminal") ?? .terminal
-        settings.defaultEditor = ToolKind(rawValue: defaultEditor.titleOfSelectedItem ?? "vscode") ?? .vscode
-        settings.preferredAIProvider = AIProvider(rawValue: preferredProvider.titleOfSelectedItem ?? "auto") ?? .auto
-        settings.apiBaseURL = apiBaseURL.stringValue
-        settings.apiKey = apiKey.stringValue
-        settings.apiModel = apiModel.stringValue
-        settings.systemPromptTemplate = systemPrompt.stringValue
-        settings.maxContextFileSize = Int(maxFileSize.stringValue) ?? 64_000
-        settings.maxFolderScanDepth = Int(maxDepth.stringValue) ?? 3
-        settings.customTemplateFolder = templateFolder.stringValue
+        settings.general.launchAtLogin = launchAtLogin.state == .on
+        settings.general.showMenuBarIcon = showMenuBarIcon.state == .on
+        settings.general.showExtensionStatus = showExtensionStatus.state == .on
+        settings.ai.enabled = aiEnabled.state == .on
+        settings.advanced.debugLogging = debugLogging.state == .on
+        settings.integrations.defaultTerminal = ToolKind(rawValue: defaultTerminal.titleOfSelectedItem ?? "terminal") ?? .terminal
+        settings.integrations.defaultEditor = ToolKind(rawValue: defaultEditor.titleOfSelectedItem ?? "vscode") ?? .vscode
+        settings.ai.preferredProvider = AIProvider(rawValue: preferredProvider.titleOfSelectedItem ?? "auto") ?? .auto
+        let profileIndex = ensureActiveAIProfile()
+        settings.ai.profiles[profileIndex].apiBaseURL = apiBaseURL.stringValue
+        settings.ai.profiles[profileIndex].apiKey = apiKey.stringValue
+        settings.ai.profiles[profileIndex].apiModel = apiModel.stringValue
+        settings.ai.profiles[profileIndex].isEnabled = true
+        let policyIndex = ensureActivePromptPolicy()
+        settings.ai.promptPolicies[policyIndex].systemPromptTemplate = systemPrompt.stringValue
+        settings.ai.promptPolicies[policyIndex].maxContextFileSize = Int(maxFileSize.stringValue) ?? 64_000
+        settings.ai.promptPolicies[policyIndex].maxFolderScanDepth = Int(maxDepth.stringValue) ?? 3
+        settings.ai.promptPolicies[policyIndex].includeHiddenFiles = includeHidden.state == .on
+        settings.templates.customTemplateFolder = templateFolder.stringValue
         settings.contextMenu.showUnavailableInPreview = showUnavailableInPreview.state == .on
         settings.contextMenu.collapseSingleActionGroups = collapseSingleGroups.state == .on
-        settings.aiActionVisibility = aiActionsField.stringValue
+        settings.ai.actionVisibility = aiActionsField.stringValue
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
-        settings.customExecutablePaths = Dictionary(uniqueKeysWithValues: customPaths.string.split(separator: "\n").compactMap {
+        settings.integrations.customExecutablePaths = Dictionary(uniqueKeysWithValues: customPaths.string.split(separator: "\n").compactMap {
             let parts = $0.split(separator: "=", maxSplits: 1).map(String.init)
             guard parts.count == 2 else { return nil }
             return (parts[0], parts[1])
         })
-        for preference in settings.toolPreferences where !preference.customPath.isEmpty {
-            settings.customExecutablePaths[preference.kind.rawValue] = preference.customPath
+        for preference in settings.integrations.toolPreferences where !preference.customPath.isEmpty {
+            settings.integrations.customExecutablePaths[preference.kind.rawValue] = preference.customPath
         }
         settings.normalizeDerivedSettings()
         SettingsStore.shared.save(settings)
@@ -589,10 +610,15 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
 
     @objc private func testConnection() {
         let detector = ToolDetector.shared.detect(settings: settings)
+        let profile = activeAIProfile()
+        let policy = activePromptPolicy()
         let message = [
             "Claude CLI: \(detector[.claude]?.isInstalled == true ? "Yes" : "No")",
             "Codex CLI: \(detector[.codex]?.isInstalled == true ? "Yes" : "No")",
-            "API Base: \(settings.apiBaseURL)"
+            "Provider: \(settings.ai.preferredProvider.rawValue)",
+            "Profile: \(profile.name)",
+            "Policy: \(policy.name)",
+            "API Base: \(profile.apiBaseURL)"
         ].joined(separator: "\n")
         PromptPanelController.showInfo(title: "AI Status", message: message)
     }
@@ -691,15 +717,17 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
     }
 
     @objc private func toggleToolMenuActions() {
-        guard let tool = selectedToolKind, let index = settings.toolPreferences.firstIndex(where: { $0.kind == tool }) else { return }
-        settings.toolPreferences[index].allowMenuActions = toolAllowActions.state == .on
+        guard let tool = selectedToolKind, let index = settings.integrations.toolPreferences.firstIndex(where: { $0.kind == tool }) else { return }
+        settings.integrations.toolPreferences[index].allowMenuActions = toolAllowActions.state == .on
+        settings.normalizeDerivedSettings()
         refreshPreview()
     }
 
     @objc private func updateToolCustomPath() {
-        guard let tool = selectedToolKind, let index = settings.toolPreferences.firstIndex(where: { $0.kind == tool }) else { return }
-        settings.toolPreferences[index].customPath = toolCustomPath.stringValue
-        settings.customExecutablePaths[tool.rawValue] = toolCustomPath.stringValue
+        guard let tool = selectedToolKind, let index = settings.integrations.toolPreferences.firstIndex(where: { $0.kind == tool }) else { return }
+        settings.integrations.toolPreferences[index].customPath = toolCustomPath.stringValue
+        settings.integrations.customExecutablePaths[tool.rawValue] = toolCustomPath.stringValue
+        settings.normalizeDerivedSettings()
         detectedTools = ToolDetector.shared.detect(settings: settings)
         toolTable.reloadData()
         refreshToolControls()
@@ -790,7 +818,7 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
 
     private func refreshToolControls() {
         guard let tool = selectedToolKind,
-              let preference = settings.toolPreferences.first(where: { $0.kind == tool }) else { return }
+              let preference = settings.integrations.toolPreferences.first(where: { $0.kind == tool }) else { return }
         let availability = detectedTools[tool]
         toolAllowActions.state = preference.allowMenuActions ? .on : .off
         toolCustomPath.stringValue = preference.customPath
@@ -800,6 +828,70 @@ final class SettingsWindowController: NSWindowController, NSTableViewDataSource,
         Executable: \(availability?.executablePath ?? "-")
         App: \(availability?.appPath ?? "-")
         """
+    }
+
+    private func activeAIProfile() -> AIProfile {
+        if let profile = settings.ai.profiles.first(where: { $0.id == settings.ai.defaultProfileID && $0.isEnabled }) {
+            return profile
+        }
+        if let profile = settings.ai.profiles.first(where: \.isEnabled) {
+            return profile
+        }
+        return settings.ai.profiles.first ?? AIProfile(id: "native-default-openai-compatible", name: "Default OpenAI-Compatible", provider: .openAICompatible, apiBaseURL: "https://api.openai.com/v1", apiKey: "", apiModel: "gpt-4.1-mini", isEnabled: true)
+    }
+
+    private func activePromptPolicy() -> PromptPolicy {
+        if let policy = settings.ai.promptPolicies.first(where: { $0.id == settings.ai.defaultPromptPolicyID }) {
+            return policy
+        }
+        return settings.ai.promptPolicies.first ?? PromptPolicy(id: "native-default-policy", name: "Default Policy", systemPromptTemplate: "You are a precise macOS power-user assistant.", maxContextFileSize: 64_000, maxFolderScanDepth: 3, includeHiddenFiles: false)
+    }
+
+    private func ensureActiveAIProfile() -> Int {
+        if let index = settings.ai.profiles.firstIndex(where: { $0.id == settings.ai.defaultProfileID }) {
+            return index
+        }
+        if let index = settings.ai.profiles.firstIndex(where: \.isEnabled) {
+            settings.ai.defaultProfileID = settings.ai.profiles[index].id
+            return index
+        }
+        let profile = AIProfile(id: "native-default-openai-compatible", name: "Default OpenAI-Compatible", provider: .openAICompatible, apiBaseURL: "https://api.openai.com/v1", apiKey: "", apiModel: "gpt-4.1-mini", isEnabled: true)
+        settings.ai.profiles = [profile]
+        settings.ai.defaultProfileID = profile.id
+        return 0
+    }
+
+    private func ensureActivePromptPolicy() -> Int {
+        if let index = settings.ai.promptPolicies.firstIndex(where: { $0.id == settings.ai.defaultPromptPolicyID }) {
+            return index
+        }
+        if !settings.ai.promptPolicies.isEmpty {
+            settings.ai.defaultPromptPolicyID = settings.ai.promptPolicies[0].id
+            return 0
+        }
+        let policy = PromptPolicy(id: "native-default-policy", name: "Default Policy", systemPromptTemplate: "You are a precise macOS power-user assistant.", maxContextFileSize: 64_000, maxFolderScanDepth: 3, includeHiddenFiles: false)
+        settings.ai.promptPolicies = [policy]
+        settings.ai.defaultPromptPolicyID = policy.id
+        return 0
+    }
+
+    private func runtimeTemplateSummary() -> String {
+        let templates = RuntimeTemplates.all(settings: settings)
+        guard !templates.isEmpty else { return "No templates available." }
+        return templates.map { template in
+            let ext = template.fileExtension.isEmpty ? "-" : template.fileExtension
+            let executable = template.makeExecutable ? " executable" : ""
+            return "\(template.id) · \(template.title) · .\(ext)\(executable)"
+        }.joined(separator: "\n")
+    }
+
+    private func customOpenActionsSummary() -> String {
+        let actions = settings.customActions.openActions.sorted { $0.sortOrder < $1.sortOrder }
+        guard !actions.isEmpty else { return "No custom open actions configured." }
+        return actions.map { action in
+            let status = action.isEnabled ? "enabled" : "disabled"
+            return "\(action.name) · \(action.targetKind) · \(action.category.rawValue) · \(status)\n\(action.appPath)"
+        }.joined(separator: "\n\n")
     }
 
     func numberOfRows(in tableView: NSTableView) -> Int {

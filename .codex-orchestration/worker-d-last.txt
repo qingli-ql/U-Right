@@ -1,0 +1,21 @@
+**已修改**
+- `electron/src/main/action-runner.ts:118`
+- `electron/src/main/action-runner.ts:612`
+- `docs/project-progress.md:39`
+- `docs/action-implementation-status.md:7`
+- `docs/context-menu-mvp-implementation.md:31`
+
+**具体接入**
+- 在 `action-runner` 正式接入 `view.refresh` / `view.toggle-hidden`，走 Electron 主线执行分发。
+- 新增 `contextViewDirectoryPath()`，复用现有 `file:// -> 本地路径` 归一化，并细分目录选择：文件取父目录、文件夹优先取选中文件夹、自带目录上下文优先复用。
+- 两个视图动作现在都会弹出明确结果提示；失败会给出错误信息和目录细节。
+- 3 份文档已同步为真实状态：动作已接通，但 registry 仍是隐藏态，默认还不会暴露。
+
+**建议主控重点复查**
+- `view.toggle-hidden` 在“选中文件夹”时是否应作用于该文件夹而不是父目录。
+- 多选场景下 `contextViewDirectoryPath()` 只在目录能收敛到单一目录时才返回，是否符合你们预期。
+- 文档与 registry 当前存在“执行已接通，但 `planned + hidden` 未改”的刻意不一致，后续是否要由主控统一切可见性。
+
+**验证**
+- 已执行 `npm run electron:build:main`，通过。
+- 还没做真机 Finder 手工验证；我建议下一步重点测 文件 / 文件夹 / 多选 / 空白区域 四种上下文。

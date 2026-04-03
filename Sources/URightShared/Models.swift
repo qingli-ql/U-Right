@@ -99,25 +99,63 @@ public struct ToolAvailability: Codable, Hashable, Sendable {
 }
 
 public struct FinderActionContext: Codable, Sendable {
+    public struct Capabilities: Codable, Hashable, Sendable {
+        public var hasWorkingDirectory: Bool
+        public var hasWritableTarget: Bool
+        public var scriptNames: [String]
+
+        public init(hasWorkingDirectory: Bool, hasWritableTarget: Bool, scriptNames: [String] = []) {
+            self.hasWorkingDirectory = hasWorkingDirectory
+            self.hasWritableTarget = hasWritableTarget
+            self.scriptNames = scriptNames
+        }
+    }
+
     public var selectedURLs: [URL]
     public var primaryURL: URL?
     public var currentDirectoryURL: URL?
+    public var resolvedTargetDirectory: URL?
+    public var resolvedPrimaryTarget: URL?
+    public var resolvedSelectionDirectory: URL?
     public var selectionKind: SelectionKind
     public var detectedTools: [ToolKind: ToolAvailability]
     public var fileMetadata: [FileMetadata]
     public var extensionWindowTitle: String?
+    public var capabilities: Capabilities?
 
-    public init(selectedURLs: [URL], primaryURL: URL?, currentDirectoryURL: URL?, selectionKind: SelectionKind, detectedTools: [ToolKind: ToolAvailability], fileMetadata: [FileMetadata], extensionWindowTitle: String? = nil) {
+    public init(
+        selectedURLs: [URL],
+        primaryURL: URL?,
+        currentDirectoryURL: URL?,
+        resolvedTargetDirectory: URL? = nil,
+        resolvedPrimaryTarget: URL? = nil,
+        resolvedSelectionDirectory: URL? = nil,
+        selectionKind: SelectionKind,
+        detectedTools: [ToolKind: ToolAvailability],
+        fileMetadata: [FileMetadata],
+        extensionWindowTitle: String? = nil,
+        capabilities: Capabilities? = nil
+    ) {
         self.selectedURLs = selectedURLs
         self.primaryURL = primaryURL
         self.currentDirectoryURL = currentDirectoryURL
+        self.resolvedTargetDirectory = resolvedTargetDirectory
+        self.resolvedPrimaryTarget = resolvedPrimaryTarget
+        self.resolvedSelectionDirectory = resolvedSelectionDirectory
         self.selectionKind = selectionKind
         self.detectedTools = detectedTools
         self.fileMetadata = fileMetadata
         self.extensionWindowTitle = extensionWindowTitle
+        self.capabilities = capabilities
     }
 
     public var workingDirectoryURL: URL? {
+        if let resolvedSelectionDirectory {
+            return resolvedSelectionDirectory
+        }
+        if let resolvedTargetDirectory {
+            return resolvedTargetDirectory
+        }
         switch selectionKind {
         case .file:
             return primaryURL?.deletingLastPathComponent()
@@ -128,6 +166,40 @@ public struct FinderActionContext: Codable, Sendable {
         case .mixed, .multi:
             return currentDirectoryURL ?? primaryURL?.deletingLastPathComponent()
         }
+    }
+}
+
+public struct FinderMenuSnapshotAvailability: Codable, Hashable, Sendable {
+    public var actionID: String
+    public var title: String
+    public var isVisible: Bool
+    public var isEnabled: Bool
+    public var reason: String?
+
+    public init(actionID: String, title: String, isVisible: Bool, isEnabled: Bool, reason: String? = nil) {
+        self.actionID = actionID
+        self.title = title
+        self.isVisible = isVisible
+        self.isEnabled = isEnabled
+        self.reason = reason
+    }
+}
+
+public struct FinderMenuSnapshot: Codable, Sendable {
+    public var updatedAt: Date
+    public var appGroupIdentifier: String
+    public var settingsVersion: Int?
+    public var context: FinderActionContext
+    public var menu: [ActionDescriptor]
+    public var availability: [FinderMenuSnapshotAvailability]
+
+    public init(updatedAt: Date = .now, appGroupIdentifier: String, settingsVersion: Int? = nil, context: FinderActionContext, menu: [ActionDescriptor], availability: [FinderMenuSnapshotAvailability]) {
+        self.updatedAt = updatedAt
+        self.appGroupIdentifier = appGroupIdentifier
+        self.settingsVersion = settingsVersion
+        self.context = context
+        self.menu = menu
+        self.availability = availability
     }
 }
 
@@ -302,6 +374,203 @@ public struct TemplateDescriptor: Codable, Hashable, Sendable {
         self.fileExtension = fileExtension
         self.starterContent = starterContent
         self.makeExecutable = makeExecutable
+    }
+}
+
+public struct GeneralSettings: Codable, Hashable, Sendable {
+    public var launchAtLogin: Bool
+    public var showMenuBarIcon: Bool
+    public var showExtensionStatus: Bool
+
+    public init(launchAtLogin: Bool = false, showMenuBarIcon: Bool = true, showExtensionStatus: Bool = true) {
+        self.launchAtLogin = launchAtLogin
+        self.showMenuBarIcon = showMenuBarIcon
+        self.showExtensionStatus = showExtensionStatus
+    }
+}
+
+public struct IntegrationSettings: Codable, Hashable, Sendable {
+    public var defaultTerminal: ToolKind
+    public var defaultEditor: ToolKind
+    public var toolPreferences: [ToolPreference]
+    public var customExecutablePaths: [String: String]
+
+    public init(
+        defaultTerminal: ToolKind = .terminal,
+        defaultEditor: ToolKind = .vscode,
+        toolPreferences: [ToolPreference] = ToolKind.allCases.map { ToolPreference(kind: $0) },
+        customExecutablePaths: [String: String] = [:]
+    ) {
+        self.defaultTerminal = defaultTerminal
+        self.defaultEditor = defaultEditor
+        self.toolPreferences = toolPreferences
+        self.customExecutablePaths = customExecutablePaths
+    }
+}
+
+public struct UserTemplateItem: Codable, Hashable, Sendable {
+    public var id: String
+    public var name: String
+    public var fileExtension: String
+    public var defaultFileName: String
+    public var starterContent: String
+    public var makeExecutable: Bool
+    public var isEnabled: Bool
+    public var sortOrder: Int
+
+    public init(
+        id: String,
+        name: String,
+        fileExtension: String,
+        defaultFileName: String,
+        starterContent: String,
+        makeExecutable: Bool = false,
+        isEnabled: Bool = true,
+        sortOrder: Int = 0
+    ) {
+        self.id = id
+        self.name = name
+        self.fileExtension = fileExtension
+        self.defaultFileName = defaultFileName
+        self.starterContent = starterContent
+        self.makeExecutable = makeExecutable
+        self.isEnabled = isEnabled
+        self.sortOrder = sortOrder
+    }
+}
+
+public struct ExtensionTemplateDefault: Codable, Hashable, Sendable {
+    public var fileExtension: String
+    public var templateID: String
+
+    public init(fileExtension: String, templateID: String) {
+        self.fileExtension = fileExtension
+        self.templateID = templateID
+    }
+}
+
+public struct TemplateSettings: Codable, Hashable, Sendable {
+    public var customTemplateFolder: String
+    public var userTemplates: [UserTemplateItem]
+    public var extensionDefaults: [ExtensionTemplateDefault]
+
+    public init(customTemplateFolder: String = "", userTemplates: [UserTemplateItem] = [], extensionDefaults: [ExtensionTemplateDefault] = []) {
+        self.customTemplateFolder = customTemplateFolder
+        self.userTemplates = userTemplates
+        self.extensionDefaults = extensionDefaults
+    }
+}
+
+public struct AIProfile: Codable, Hashable, Sendable {
+    public var id: String
+    public var name: String
+    public var provider: AIProvider
+    public var apiBaseURL: String
+    public var apiKey: String
+    public var apiModel: String
+    public var isEnabled: Bool
+
+    public init(id: String, name: String, provider: AIProvider, apiBaseURL: String, apiKey: String, apiModel: String, isEnabled: Bool = true) {
+        self.id = id
+        self.name = name
+        self.provider = provider
+        self.apiBaseURL = apiBaseURL
+        self.apiKey = apiKey
+        self.apiModel = apiModel
+        self.isEnabled = isEnabled
+    }
+}
+
+public struct PromptPolicy: Codable, Hashable, Sendable {
+    public var id: String
+    public var name: String
+    public var systemPromptTemplate: String
+    public var maxContextFileSize: Int
+    public var maxFolderScanDepth: Int
+    public var includeHiddenFiles: Bool
+
+    public init(id: String, name: String, systemPromptTemplate: String, maxContextFileSize: Int, maxFolderScanDepth: Int, includeHiddenFiles: Bool) {
+        self.id = id
+        self.name = name
+        self.systemPromptTemplate = systemPromptTemplate
+        self.maxContextFileSize = maxContextFileSize
+        self.maxFolderScanDepth = maxFolderScanDepth
+        self.includeHiddenFiles = includeHiddenFiles
+    }
+}
+
+public struct AISettings: Codable, Hashable, Sendable {
+    public var enabled: Bool
+    public var preferredProvider: AIProvider
+    public var profiles: [AIProfile]
+    public var defaultProfileID: String?
+    public var promptPolicies: [PromptPolicy]
+    public var defaultPromptPolicyID: String?
+    public var actionVisibility: [String]
+
+    public init(
+        enabled: Bool = true,
+        preferredProvider: AIProvider = .auto,
+        profiles: [AIProfile] = [],
+        defaultProfileID: String? = nil,
+        promptPolicies: [PromptPolicy] = [],
+        defaultPromptPolicyID: String? = nil,
+        actionVisibility: [String] = []
+    ) {
+        self.enabled = enabled
+        self.preferredProvider = preferredProvider
+        self.profiles = profiles
+        self.defaultProfileID = defaultProfileID
+        self.promptPolicies = promptPolicies
+        self.defaultPromptPolicyID = defaultPromptPolicyID
+        self.actionVisibility = actionVisibility
+    }
+}
+
+public struct CustomOpenAction: Codable, Hashable, Sendable {
+    public var id: String
+    public var name: String
+    public var appPath: String
+    public var bundleIdentifier: String?
+    public var targetKind: String
+    public var isEnabled: Bool
+    public var sortOrder: Int
+    public var category: ActionCategory
+
+    public init(
+        id: String,
+        name: String,
+        appPath: String,
+        bundleIdentifier: String? = nil,
+        targetKind: String = "any",
+        isEnabled: Bool = true,
+        sortOrder: Int = 0,
+        category: ActionCategory = .open
+    ) {
+        self.id = id
+        self.name = name
+        self.appPath = appPath
+        self.bundleIdentifier = bundleIdentifier
+        self.targetKind = targetKind
+        self.isEnabled = isEnabled
+        self.sortOrder = sortOrder
+        self.category = category
+    }
+}
+
+public struct CustomActionSettings: Codable, Hashable, Sendable {
+    public var openActions: [CustomOpenAction]
+
+    public init(openActions: [CustomOpenAction] = []) {
+        self.openActions = openActions
+    }
+}
+
+public struct AdvancedSettings: Codable, Hashable, Sendable {
+    public var debugLogging: Bool
+
+    public init(debugLogging: Bool = false) {
+        self.debugLogging = debugLogging
     }
 }
 

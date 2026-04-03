@@ -1,0 +1,25 @@
+你是 Worker C，负责 Track C：最小验证与文档收口。先阅读以下文档和代码，再直接落档：
+- docs/project-progress.md
+- docs/action-implementation-status.md
+- docs/product-planning-settings-contextmenu-ai.md
+- docs/context-menu-mvp-implementation.md
+- docs/release-checklist.md
+- README.md
+- AGENTS.md
+
+你的唯一写入范围：
+- docs/implementation-tracks.md
+- docs/manual-validation-checklist.md
+
+任务目标：
+1. 新建一份并行开发轨道文档，明确 Track A/B/C/D 的目标、边界、依赖、可并行性和验收条件
+2. 新建一份手动验证清单，覆盖 Finder 文件/文件夹/多选/空白区域，以及本轮将补的动作和 AI/设置关键回归点
+3. 文风保持简洁、真实、可执行，不要写空泛规划
+4. 不要修改其它文件
+
+注意：你不是单独在代码库里工作，别回滚别人的改动；只改你负责的两个文档文件。
+
+完成后请给出：
+- 改了哪些文件
+- 每个文档解决了什么问题
+- 主控应如何在最终汇总里引用这些文档

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>U-Right Icon Concepts</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0d10;
+        --panel: #13171d;
+        --line: rgba(255,255,255,0.08);
+        --text: #f2eadf;
+        --muted: #9f998f;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at top, rgba(214,170,102,0.18), transparent 32%),
+          var(--bg);
+        color: var(--text);
+        font-family: Georgia, "Times New Roman", serif;
+      }
+      .wrap {
+        width: min(1240px, calc(100vw - 48px));
+        margin: 0 auto;
+        padding: 40px 0 72px;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 48px;
+        letter-spacing: 1px;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+        line-height: 1.6;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 22px;
+        margin-top: 28px;
+      }
+      .card {
+        padding: 20px;
+        border-radius: 28px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+      img {
+        width: 100%;
+        aspect-ratio: 1;
+        display: block;
+        border-radius: 22px;
+        background: rgba(255,255,255,0.02);
+      }
+      h2 {
+        margin: 18px 0 0;
+        font-size: 28px;
+      }
+      @media (max-width: 980px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>U-Right 图标方向草图</h1>
+      <p>先选方向，再精修。三套方案分别偏向：品牌主标识、编辑部质感、工业工具感。</p>
+      <div class="grid">
+        <div class="card">
+          <img src="./option-a-monogram-beam.svg" alt="Option A" />
+          <h2>A · Monogram Beam</h2>
+        </div>
+        <div class="card">
+          <img src="./option-b-editorial-plate.svg" alt="Option B" />
+          <h2>B · Editorial UR</h2>
+        </div>
+        <div class="card">
+          <img src="./option-c-industrial-arrow.svg" alt="Option C" />
+          <h2>C · Industrial Arrow</h2>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

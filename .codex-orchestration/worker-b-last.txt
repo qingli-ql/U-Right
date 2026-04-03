@@ -1,0 +1,23 @@
+**完成内容**
+- 仅改了 `electron/src/main/finder-view-actions.ts:1`
+- 新增了独立主进程辅助模块，封装了 Finder 视图动作的路径校验、系统命令执行、AppleScript 调用和统一结果结构
+
+**导出 API**
+- `refreshFinderWindows(options)`：刷新 Finder 窗口，支持按目录优先刷新相关窗口，定义见 `electron/src/main/finder-view-actions.ts:167`
+- `toggleFinderHiddenFiles(options)`：切换指定目录场景下的隐藏文件显示，定义见 `electron/src/main/finder-view-actions.ts:208`
+- 相关类型：`FinderViewActionResult`、`RefreshFinderWindowOptions`、`ToggleFinderHiddenFilesOptions`，见 `electron/src/main/finder-view-actions.ts:8`
+
+**接入方式**
+- 主进程后续可直接 `import { refreshFinderWindows, toggleFinderHiddenFiles } from "./finder-view-actions"`
+- `view.refresh` 示例：`await refreshFinderWindows({ directoryPath, activateFinder: true })`
+- `view.toggle-hidden` 示例：`await toggleFinderHiddenFiles({ directoryPath, desiredVisible: true })`
+- 两个函数都返回统一结果：`{ ok, changed, message, errorMessage, details }`，适合直接做 toast / log / result window 提示
+
+**主控还需补**
+- 在 `action-runner` 里把 `view.refresh` / `view.toggle-hidden` actionID 接到这两个函数
+- 把返回结果接到日志/结果提示链路
+- 视图动作当前目录应复用现有 context 归一化入口传入
+- 需注意：隐藏文件显示在 macOS/Finder 实际上是全局偏好；模块已在 `details.scopeIsGlobalFinderPreference` 里显式标出
+
+**校验**
+- 已跑通 `npx tsc -p electron/tsconfig.node.json --noEmit`

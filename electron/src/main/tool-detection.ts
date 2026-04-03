@@ -2,71 +2,121 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import type { ToolAvailability, ToolKind } from "../shared/contracts";
+import { TOOL_CATALOG, TOOL_CATALOG_BY_KIND } from "../shared/tool-catalog";
+import { getCustomExecutablePath } from "../shared/resolved-settings";
 import { loadSettings } from "./store";
 
-const APP_NAMES: Record<ToolKind, string[]> = {
-  terminal: ["Terminal.app"],
-  ghostty: ["Ghostty.app"],
-  iTerm: ["iTerm.app", "iTerm2.app"],
-  vscode: ["Visual Studio Code.app"],
-  cursor: ["Cursor.app"],
-  zed: ["Zed.app"],
-  claude: ["Claude.app"],
-  codex: ["Codex.app"],
-  gh: ["GitUp.app"],
-  lazygit: ["GitUp.app"],
-  gitup: ["GitUp.app"]
-};
+const HOME = process.env.HOME ?? "";
+const COMMON_BINARY_DIRS = [
+  "/opt/homebrew/bin",
+  "/opt/homebrew/sbin",
+  "/usr/local/bin",
+  "/usr/local/sbin",
+  "/usr/bin",
+  "/bin",
+  path.join(HOME, ".local/bin"),
+  path.join(HOME, ".bun/bin")
+].filter(Boolean);
 
-const BINARIES: Record<ToolKind, string[]> = {
-  terminal: ["open"],
-  ghostty: ["ghostty"],
-  iTerm: ["iterm2"],
-  vscode: ["code"],
-  cursor: ["cursor"],
-  zed: ["zed"],
-  claude: ["claude"],
-  codex: ["codex"],
-  gh: ["gh"],
-  lazygit: ["lazygit"],
-  gitup: ["gitup"]
-};
+const APPLICATION_ROOTS = [
+  "/Applications",
+  "/Applications/Utilities",
+  "/Applications/Setapp",
+  "/System/Applications",
+  "/System/Applications/Utilities",
+  path.join(HOME, "Applications")
+].filter(Boolean);
 
-function which(binary: string): string | undefined {
+function safeExec(command: string, args: string[]): string | undefined {
   try {
-    return execFileSync("/usr/bin/which", [binary], { encoding: "utf8" }).trim() || undefined;
+    const output = execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    return output || undefined;
   } catch {
     return undefined;
   }
 }
 
-function findApp(tool: ToolKind): string | undefined {
-  const roots = ["/Applications", path.join(process.env.HOME ?? "", "Applications")];
-  for (const appName of APP_NAMES[tool]) {
-    for (const root of roots) {
+function which(binary: string): string | undefined {
+  return safeExec("/usr/bin/which", [binary]);
+}
+
+function shellLocate(binary: string): string | undefined {
+  return safeExec("/bin/zsh", ["-lc", `command -v ${binary}`]);
+}
+
+function searchCommonBinaryDirs(binary: string): string | undefined {
+  for (const directory of COMMON_BINARY_DIRS) {
+    const candidate = path.join(directory, binary);
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return undefined;
+}
+
+function findBinary(kind: ToolKind, customPath?: string | null): string | undefined {
+  if (customPath && fs.existsSync(customPath)) {
+    return customPath;
+  }
+  const entry = TOOL_CATALOG_BY_KIND.get(kind);
+  if (!entry) {
+    return undefined;
+  }
+  for (const binary of entry.binaries) {
+    const hit = which(binary) ?? searchCommonBinaryDirs(binary) ?? shellLocate(binary);
+    if (hit) {
+      return hit;
+    }
+  }
+  return undefined;
+}
+
+function findByBundleIdentifier(bundleIdentifier: string): string | undefined {
+  const hit = safeExec("/usr/bin/mdfind", [`kMDItemCFBundleIdentifier == "${bundleIdentifier}"`]);
+  if (!hit) {
+    return undefined;
+  }
+  return hit.split("\n").find((item) => item.endsWith(".app"));
+}
+
+function findApp(kind: ToolKind): string | undefined {
+  const entry = TOOL_CATALOG_BY_KIND.get(kind);
+  if (!entry) {
+    return undefined;
+  }
+
+  for (const appName of entry.appNames) {
+    for (const root of APPLICATION_ROOTS) {
       const candidate = path.join(root, appName);
       if (fs.existsSync(candidate)) {
         return candidate;
       }
     }
   }
+
+  for (const bundleIdentifier of entry.bundleIdentifiers) {
+    const found = findByBundleIdentifier(bundleIdentifier);
+    if (found) {
+      return found;
+    }
+  }
+
   return undefined;
 }
 
 export function detectTools(): Record<ToolKind, ToolAvailability> {
   const settings = loadSettings();
   const result = {} as Record<ToolKind, ToolAvailability>;
-  (Object.keys(BINARIES) as ToolKind[]).forEach((tool) => {
-    const customPath = settings.customExecutablePaths[tool];
-    const executablePath =
-      customPath && fs.existsSync(customPath) ? customPath : BINARIES[tool].map(which).find(Boolean);
-    const appPath = findApp(tool);
-    result[tool] = {
-      kind: tool,
+  for (const entry of TOOL_CATALOG) {
+    const customPath = getCustomExecutablePath(settings, entry.kind);
+    const executablePath = findBinary(entry.kind, customPath);
+    const appPath = findApp(entry.kind);
+    result[entry.kind] = {
+      kind: entry.kind,
       isInstalled: Boolean(executablePath || appPath),
       executablePath,
       appPath
     };
-  });
+  }
   return result;
 }

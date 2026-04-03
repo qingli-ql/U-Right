@@ -93,6 +93,12 @@ public struct AppSettings: Codable, Sendable {
     public var contextMenu: ContextMenuSettings
     public var toolPreferences: [ToolPreference]
     public var aiActionVisibility: [String]
+    public var general: GeneralSettings
+    public var integrations: IntegrationSettings
+    public var templates: TemplateSettings
+    public var ai: AISettings
+    public var customActions: CustomActionSettings
+    public var advanced: AdvancedSettings
 
     public init(
         launchAtLogin: Bool = false,
@@ -117,7 +123,13 @@ public struct AppSettings: Codable, Sendable {
         lastAIActionID: String? = nil,
         contextMenu: ContextMenuSettings = .init(),
         toolPreferences: [ToolPreference] = ToolKind.allCases.map { ToolPreference(kind: $0) },
-        aiActionVisibility: [String] = []
+        aiActionVisibility: [String] = [],
+        general: GeneralSettings = .init(),
+        integrations: IntegrationSettings = .init(),
+        templates: TemplateSettings = .init(),
+        ai: AISettings = .init(),
+        customActions: CustomActionSettings = .init(),
+        advanced: AdvancedSettings = .init()
     ) {
         self.launchAtLogin = launchAtLogin
         self.showMenuBarIcon = showMenuBarIcon
@@ -142,10 +154,61 @@ public struct AppSettings: Codable, Sendable {
         self.contextMenu = contextMenu
         self.toolPreferences = toolPreferences
         self.aiActionVisibility = aiActionVisibility
+        self.general = general
+        self.integrations = integrations
+        self.templates = templates
+        self.ai = ai
+        self.customActions = customActions
+        self.advanced = advanced
         normalizeDerivedSettings()
     }
 
     public mutating func normalizeDerivedSettings() {
+        general.launchAtLogin = launchAtLogin
+        general.showMenuBarIcon = showMenuBarIcon
+        general.showExtensionStatus = showExtensionStatus
+
+        integrations.defaultTerminal = defaultTerminal
+        integrations.defaultEditor = defaultEditor
+        integrations.customExecutablePaths.merge(customExecutablePaths, uniquingKeysWith: { _, new in new })
+        if integrations.toolPreferences.isEmpty {
+            integrations.toolPreferences = ToolKind.allCases.map { ToolPreference(kind: $0) }
+        }
+
+        templates.customTemplateFolder = customTemplateFolder
+
+        ai.enabled = aiEnabled
+        ai.preferredProvider = preferredAIProvider
+        ai.actionVisibility = aiActionVisibility
+        if ai.profiles.isEmpty {
+            ai.profiles = [
+                AIProfile(
+                    id: "default-openai-compatible",
+                    name: "Default OpenAI-Compatible",
+                    provider: .openAICompatible,
+                    apiBaseURL: apiBaseURL,
+                    apiKey: apiKey,
+                    apiModel: apiModel
+                )
+            ]
+            ai.defaultProfileID = ai.profiles.first?.id
+        }
+        if ai.promptPolicies.isEmpty {
+            ai.promptPolicies = [
+                PromptPolicy(
+                    id: "legacy-default",
+                    name: "Legacy Default",
+                    systemPromptTemplate: systemPromptTemplate,
+                    maxContextFileSize: maxContextFileSize,
+                    maxFolderScanDepth: maxFolderScanDepth,
+                    includeHiddenFiles: includeHiddenFiles
+                )
+            ]
+            ai.defaultPromptPolicyID = ai.promptPolicies.first?.id
+        }
+
+        advanced.debugLogging = debugLogging
+
         let defaultCategorySettings = ActionCatalog.categoryDefinitions.map {
             MenuCategorySettings(
                 category: $0.category,
@@ -181,6 +244,9 @@ public struct AppSettings: Codable, Sendable {
         if toolPreferences.isEmpty {
             toolPreferences = ToolKind.allCases.map { ToolPreference(kind: $0) }
         }
+        if integrations.toolPreferences.isEmpty {
+            integrations.toolPreferences = toolPreferences
+        }
         for index in toolPreferences.indices {
             let key = toolPreferences[index].kind.rawValue
             if toolPreferences[index].customPath.isEmpty, let existing = customExecutablePaths[key], !existing.isEmpty {
@@ -193,6 +259,41 @@ public struct AppSettings: Codable, Sendable {
         if aiActionVisibility.isEmpty {
             aiActionVisibility = ActionCatalog.defaultVisibleAIActionIDs
         }
+
+        for index in integrations.toolPreferences.indices {
+            let key = integrations.toolPreferences[index].kind.rawValue
+            if integrations.toolPreferences[index].customPath.isEmpty, let existing = integrations.customExecutablePaths[key], !existing.isEmpty {
+                integrations.toolPreferences[index].customPath = existing
+            }
+            if !integrations.toolPreferences[index].customPath.isEmpty {
+                integrations.customExecutablePaths[key] = integrations.toolPreferences[index].customPath
+            }
+        }
+
+        if let activeProfile = ai.profiles.first(where: { $0.id == ai.defaultProfileID && $0.isEnabled }) ?? ai.profiles.first(where: \.isEnabled) ?? ai.profiles.first {
+            preferredAIProvider = ai.preferredProvider
+            apiBaseURL = activeProfile.apiBaseURL
+            apiKey = activeProfile.apiKey
+            apiModel = activeProfile.apiModel
+        }
+        if let activePolicy = ai.promptPolicies.first(where: { $0.id == ai.defaultPromptPolicyID }) ?? ai.promptPolicies.first {
+            systemPromptTemplate = activePolicy.systemPromptTemplate
+            maxContextFileSize = activePolicy.maxContextFileSize
+            maxFolderScanDepth = activePolicy.maxFolderScanDepth
+            includeHiddenFiles = activePolicy.includeHiddenFiles
+        }
+
+        launchAtLogin = general.launchAtLogin
+        showMenuBarIcon = general.showMenuBarIcon
+        showExtensionStatus = general.showExtensionStatus
+        defaultTerminal = integrations.defaultTerminal
+        defaultEditor = integrations.defaultEditor
+        toolPreferences = integrations.toolPreferences
+        customExecutablePaths = integrations.customExecutablePaths
+        customTemplateFolder = templates.customTemplateFolder
+        aiEnabled = ai.enabled
+        aiActionVisibility = ai.actionVisibility.isEmpty ? ActionCatalog.defaultVisibleAIActionIDs : ai.actionVisibility
+        debugLogging = advanced.debugLogging
     }
 
     enum CodingKeys: String, CodingKey {
@@ -219,6 +320,12 @@ public struct AppSettings: Codable, Sendable {
         case contextMenu
         case toolPreferences
         case aiActionVisibility
+        case general
+        case integrations
+        case templates
+        case ai
+        case customActions
+        case advanced
     }
 
     public init(from decoder: Decoder) throws {
@@ -246,6 +353,12 @@ public struct AppSettings: Codable, Sendable {
         contextMenu = try container.decodeIfPresent(ContextMenuSettings.self, forKey: .contextMenu) ?? .init()
         toolPreferences = try container.decodeIfPresent([ToolPreference].self, forKey: .toolPreferences) ?? []
         aiActionVisibility = try container.decodeIfPresent([String].self, forKey: .aiActionVisibility) ?? []
+        general = try container.decodeIfPresent(GeneralSettings.self, forKey: .general) ?? .init()
+        integrations = try container.decodeIfPresent(IntegrationSettings.self, forKey: .integrations) ?? .init()
+        templates = try container.decodeIfPresent(TemplateSettings.self, forKey: .templates) ?? .init()
+        ai = try container.decodeIfPresent(AISettings.self, forKey: .ai) ?? .init()
+        customActions = try container.decodeIfPresent(CustomActionSettings.self, forKey: .customActions) ?? .init()
+        advanced = try container.decodeIfPresent(AdvancedSettings.self, forKey: .advanced) ?? .init()
         normalizeDerivedSettings()
     }
 }
@@ -265,7 +378,7 @@ public final class SettingsStore: @unchecked Sendable {
     private let key = "AppSettings"
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
-    private let currentDocumentVersion = 1
+    private let currentDocumentVersion = 2
 
     public init(defaults: UserDefaults? = nil) {
         let appGroupIdentifier = URightConstants.appGroupIdentifier
@@ -281,16 +394,19 @@ public final class SettingsStore: @unchecked Sendable {
     }
 
     public func load() -> AppSettings {
-        if let settings = loadFromDisk(url: fileURL) {
-            return settings
+        if let payload = loadDocumentPayload(url: fileURL) {
+            if payload.didNormalize {
+                save(payload.settings)
+            }
+            return payload.settings
         }
-        if let settings = loadFromDisk(url: backupURL) {
-            save(settings)
-            return settings
+        if let payload = loadDocumentPayload(url: backupURL) {
+            save(payload.settings)
+            return payload.settings
         }
         if let defaults,
            let data = defaults.data(forKey: key),
-           let settings = decodeSettings(from: data) {
+           let settings = decodeSettings(from: data, sourceVersion: 0) {
             save(settings)
             return settings
         }
@@ -300,10 +416,11 @@ public final class SettingsStore: @unchecked Sendable {
     }
 
     public func save(_ settings: AppSettings) {
-        let document = StoredSettingsDocument(version: currentDocumentVersion, updatedAt: .now, settings: settings)
+        let normalized = normalizeSettings(settings, sourceVersion: currentDocumentVersion)
+        let document = StoredSettingsDocument(version: currentDocumentVersion, updatedAt: .now, settings: normalized)
         guard let data = try? encoder.encode(document) else { return }
         if let defaults {
-            defaults.set(try? encoder.encode(settings), forKey: key)
+            defaults.set(try? encoder.encode(normalized), forKey: key)
         }
         if let existing = try? Data(contentsOf: fileURL) {
             try? existing.write(to: backupURL, options: .atomic)
@@ -311,15 +428,76 @@ public final class SettingsStore: @unchecked Sendable {
         try? data.write(to: fileURL, options: .atomic)
     }
 
-    private func loadFromDisk(url: URL) -> AppSettings? {
+    private func loadDocumentPayload(url: URL) -> (settings: AppSettings, didNormalize: Bool)? {
         guard let data = try? Data(contentsOf: url) else { return nil }
-        return decodeSettings(from: data)
+        if let document = try? decoder.decode(StoredSettingsDocument.self, from: data),
+           let normalized = normalizeDecodedDocument(document.settings, sourceVersion: document.version) {
+            return (normalized.settings, normalized.didChange || document.version < currentDocumentVersion)
+        }
+        if let settings = try? decoder.decode(AppSettings.self, from: data),
+           let normalized = normalizeDecodedDocument(settings, sourceVersion: 0) {
+            return (normalized.settings, true)
+        }
+        return nil
     }
 
-    private func decodeSettings(from data: Data) -> AppSettings? {
+    private func decodeSettings(from data: Data, sourceVersion: Int) -> AppSettings? {
         if let document = try? decoder.decode(StoredSettingsDocument.self, from: data) {
-            return document.settings
+            return normalizeSettings(document.settings, sourceVersion: document.version)
         }
-        return try? decoder.decode(AppSettings.self, from: data)
+        if let settings = try? decoder.decode(AppSettings.self, from: data) {
+            return normalizeSettings(settings, sourceVersion: sourceVersion)
+        }
+        return nil
     }
+
+    private func normalizeDecodedDocument(_ settings: AppSettings, sourceVersion: Int) -> (settings: AppSettings, didChange: Bool)? {
+        let normalized = normalizeSettings(settings, sourceVersion: sourceVersion)
+        let encoder = JSONEncoder()
+        guard
+            let originalData = try? encoder.encode(settings),
+            let normalizedData = try? encoder.encode(normalized)
+        else {
+            return (normalized, true)
+        }
+        return (normalized, originalData != normalizedData)
+    }
+
+    public func currentDocumentVersionNumber() -> Int {
+        currentDocumentVersion
+    }
+}
+
+private func normalizeSettings(_ settings: AppSettings, sourceVersion: Int) -> AppSettings {
+    var normalized = settings
+    normalized.normalizeDerivedSettings()
+
+    let defaultCategorySettings = ActionCatalog.categoryDefinitions.map {
+        MenuCategorySettings(category: $0.category, isEnabled: true, order: $0.defaultOrder, displayStyle: $0.defaultDisplayStyle)
+    }
+    let defaultActionSettings = ActionCatalog.allDefinitions.map {
+        MenuActionSettings(actionID: $0.id, isEnabled: $0.defaultVisible)
+    }
+
+    let existingCategorySettings = Dictionary(uniqueKeysWithValues: normalized.contextMenu.categorySettings.map { ($0.category, $0) })
+    normalized.contextMenu.categorySettings = defaultCategorySettings.map { existingCategorySettings[$0.category] ?? $0 }
+
+    let existingActionSettings = Dictionary(uniqueKeysWithValues: normalized.contextMenu.actionSettings.map { ($0.actionID, $0) })
+    normalized.contextMenu.actionSettings = defaultActionSettings.map { existingActionSettings[$0.actionID] ?? $0 }
+
+    if sourceVersion < 2 {
+        for group in ActionCatalog.promotedVisibilityGroups {
+            let previousGroupSettings = group.map { existingActionSettings[$0] }
+            let shouldPromoteWholeGroup = previousGroupSettings.allSatisfy { item in
+                guard let item else { return false }
+                return item.isEnabled == false && item.categoryOverride == nil && item.orderOverride == nil
+            }
+            if shouldPromoteWholeGroup {
+                normalized.contextMenu.actionSettings = normalized.contextMenu.actionSettings.map { item in
+                    group.contains(item.actionID) ? MenuActionSettings(actionID: item.actionID, isEnabled: true, categoryOverride: item.categoryOverride, orderOverride: item.orderOverride) : item
+                }
+            }
+        }
+    }
+    return normalized
 }

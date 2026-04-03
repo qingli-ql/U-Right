@@ -6,6 +6,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_PATH="$ROOT/build/xcode/$CONFIG/U-Right.app"
 INSTALL_PATH="${APP_INSTALL_PATH:-/Applications/U-Right.app}"
 APP_GROUP_IDENTIFIER="${APP_GROUP_IDENTIFIER:-$("$ROOT/scripts/app_group_id.sh")}"
+REBUILD_BEFORE_INSTALL="${REBUILD_BEFORE_INSTALL:-1}"
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister"
 PLUGINKIT="/usr/bin/pluginkit"
 DITTO="/usr/bin/ditto"
@@ -14,7 +15,7 @@ BUILD_PLUGIN_PATH="$APP_PATH/Contents/PlugIns/U-Right Finder Sync.appex"
 INSTALL_PLUGIN_PATH="$INSTALL_PATH/Contents/PlugIns/U-Right Finder Sync.appex"
 TMP_INSTALL_PATH="${INSTALL_PATH}.tmp.$$"
 
-if [[ ! -d "$APP_PATH" ]]; then
+if [[ "$REBUILD_BEFORE_INSTALL" == "1" || ! -d "$APP_PATH" ]]; then
   APP_GROUP_IDENTIFIER="$APP_GROUP_IDENTIFIER" "$ROOT/scripts/build_app.sh" "$CONFIG"
 fi
 

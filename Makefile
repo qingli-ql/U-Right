@@ -3,7 +3,7 @@ APP_INSTALL_PATH ?= /Applications/U-Right.app
 DEVELOPMENT_TEAM ?= $(shell ./scripts/detect_team.sh)
 APP_GROUP_IDENTIFIER ?= $(shell DEVELOPMENT_TEAM="$(DEVELOPMENT_TEAM)" ./scripts/app_group_id.sh)
 
-.PHONY: build run native-run install clean open-extension-settings tail-logs team-id dev-build dev-install dev native-dev-run dev-run reload-extension electron-dev electron-build app-group-id doctor extension-status dump-entitlements debug-unified-log requests-ls render-icons
+.PHONY: build run native-run install clean open-extension-settings tail-logs team-id dev-build dev-install dev native-dev-run dev-run reload-extension reload-extension-open electron-dev electron-build app-group-id doctor extension-status dump-entitlements debug-unified-log requests-ls render-icons cleanup-legacy-container validate-action-registry
 
 build:
 	APP_GROUP_IDENTIFIER="$(APP_GROUP_IDENTIFIER)" DEVELOPMENT_TEAM="$(DEVELOPMENT_TEAM)" ./scripts/build_app.sh $(CONFIG)
@@ -41,11 +41,17 @@ dev-install:
 reload-extension:
 	APP_GROUP_IDENTIFIER="$(APP_GROUP_IDENTIFIER)" ./scripts/reload_extension.sh $(APP_INSTALL_PATH)
 
+reload-extension-open:
+	OPEN_APP_AFTER_RELOAD=1 APP_GROUP_IDENTIFIER="$(APP_GROUP_IDENTIFIER)" ./scripts/reload_extension.sh $(APP_INSTALL_PATH)
+
 electron-dev:
 	APP_GROUP_IDENTIFIER="$(APP_GROUP_IDENTIFIER)" DEVELOPMENT_TEAM="$(DEVELOPMENT_TEAM)" ./scripts/dev_electron.sh $(CONFIG)
 
 electron-build:
 	npm run electron:build
+
+validate-action-registry:
+	npm run validate:action-registry
 
 render-icons:
 	./scripts/render_app_icons.sh
@@ -81,3 +87,6 @@ debug-unified-log:
 
 requests-ls:
 	@ls -la "$$HOME/Library/Group Containers/$(APP_GROUP_IDENTIFIER)/Requests" 2>/dev/null || echo "Requests directory missing"
+
+cleanup-legacy-container:
+	@APP_GROUP_IDENTIFIER="$(APP_GROUP_IDENTIFIER)" ./scripts/cleanup_legacy_container.sh

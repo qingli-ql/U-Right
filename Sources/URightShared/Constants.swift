@@ -10,6 +10,7 @@ public enum URightConstants {
     public static let extensionWakeNotification = Notification.Name("com.openai.uright.extension-status")
     public static let logFileName = "uright.log"
     public static let devHostStateFileName = "dev-host-state.json"
+    public static let finderMenuSnapshotFileName = "finder-menu-snapshot.json"
     public static let settingsFileName = "settings.json"
     public static let settingsBackupFileName = "settings.backup.json"
     public static let requestDirectoryName = "Requests"

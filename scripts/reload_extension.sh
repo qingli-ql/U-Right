@@ -7,7 +7,7 @@ APPEX_PATH="$APP_PATH/Contents/PlugIns/U-Right Finder Sync.appex"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PLUGINKIT="/usr/bin/pluginkit"
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Versions/Current/Frameworks/LaunchServices.framework/Versions/Current/Support/lsregister"
-OPEN_APP_AFTER_RELOAD="${OPEN_APP_AFTER_RELOAD:-1}"
+OPEN_APP_AFTER_RELOAD="${OPEN_APP_AFTER_RELOAD:-0}"
 
 if [[ ! -d "$APP_PATH" ]]; then
   echo "App not found: $APP_PATH" >&2

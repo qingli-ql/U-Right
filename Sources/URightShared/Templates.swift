@@ -17,3 +17,22 @@ public enum BuiltInTemplates {
         .init(id: "env", title: ".env", fileNameSuggestion: ".env", fileExtension: "", starterContent: "# Environment variables\n")
     ]
 }
+
+public enum RuntimeTemplates {
+    public static func all(settings: AppSettings) -> [TemplateDescriptor] {
+        let userTemplates = settings.templates.userTemplates
+            .filter(\.isEnabled)
+            .sorted { $0.sortOrder < $1.sortOrder }
+            .map {
+                TemplateDescriptor(
+                    id: "user.\($0.id)",
+                    title: $0.name,
+                    fileNameSuggestion: $0.defaultFileName,
+                    fileExtension: $0.fileExtension,
+                    starterContent: $0.starterContent,
+                    makeExecutable: $0.makeExecutable
+                )
+            }
+        return BuiltInTemplates.all + userTemplates
+    }
+}

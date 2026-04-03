@@ -179,10 +179,10 @@ final class OpenToolActionHandler: ActionHandler, ActionContextResolving {
         self.tools = tools
     }
 
-    var actionIDs: [String] { [ActionIDs.openTerminal, ActionIDs.openVSCode, ActionIDs.openCursor, ActionIDs.openZed, ActionIDs.revealInFinder] }
+    var actionIDs: [String] { [ActionIDs.openTerminal, ActionIDs.openVSCode, ActionIDs.openCursor, ActionIDs.openZed, ActionIDs.revealInFinder, "open.custom."] }
 
     func canPerform(actionID: String, context: FinderActionContext, settings: AppSettings) -> Bool {
-        true
+        actionID.hasPrefix("open.custom.") || true
     }
 
     func perform(actionID: String, context: FinderActionContext, settings: AppSettings) throws -> ActionExecutionResult {
@@ -203,6 +203,14 @@ final class OpenToolActionHandler: ActionHandler, ActionContextResolving {
             NSWorkspace.shared.activateFileViewerSelecting(actionTargets(for: context))
             return .success(nil)
         default:
+            if actionID.hasPrefix("open.custom.") {
+                let customID = String(actionID.dropFirst("open.custom.".count))
+                guard let customAction = settings.customActions.openActions.first(where: { $0.id == customID && $0.isEnabled }) else {
+                    return .failure("未找到自定义打开动作")
+                }
+                try tools.openWithApplication(at: customAction.appPath, urls: actionTargets(for: context))
+                return .success(nil)
+            }
             return .failure("不支持的打开动作")
         }
     }

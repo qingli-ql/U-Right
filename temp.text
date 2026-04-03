@@ -1,0 +1,1291 @@
+Last login: Fri Apr  3 01:01:50 on ttys008
+/Users/qingli/Downloads/api-worker-macos-m ; exit;                                                                      
+(sys) ~ ❯ /Users/qingli/Downloads/api-worker-macos-m ; exit;
+running with pid: 91140
+upgrading d41d8cd98f00b204e9800998ecf8427e
+starting 813c394f6699099b355c3052b49b3d5a
+version: 1.1.46
+HTTPS_PROXY http://127.0.0.1:7897
+Server is running on http://localhost:9182
+id 812460a8-7c40-48b9-8325-edc260b603a7
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id 95c17fd4-218a-442f-b9d4-daa31a0232a7
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 13878,
+}
+size 4
+c0 delay=1837 total=1837
+end
+id ce04419f-484f-4276-89f0-b70521b8529b
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id 95c17fd4-218a-442f-b9d4-daa31a0232a7
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 13980,
+}
+size 6
+c0 delay=3452 total=3452
+end
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189745737",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189778765",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189812106",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189845040",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189877522",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189911540",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189944894",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775189977469",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190010944",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190044070",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190077166",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190110401",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190142994",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190176475",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190209034",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190241913",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190275154",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190308420",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190341119",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190373963",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190406591",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190440349",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190474284",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190507655",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190541297",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190574087",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190606208",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190639464",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190671800",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190704883",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190738276",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190772222",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190805540",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190838046",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190869819",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190902740",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190935940",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775190967802",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775191000735",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775191033573",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775191066806",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775191099629",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775191132960",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+error: The socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()
+  path: "https://static.quan2go.com/js/api-worker.txt?t=1775191164705",
+ errno: 0,
+  code: "ECONNRESET"
+
+
+id 8bdffa73-36f7-44ca-bbac-da03e89f0d88
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id f817014b-45d8-478c-900e-90e95c14d4aa
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 22298,
+}
+size 4
+c0 delay=5661 total=5661
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 22657,
+}
+size 6
+c0 delay=3062 total=3062
+tool call:  Glob
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 68736,
+}
+size 8
+c0 delay=3918 total=3918
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 69581,
+}
+size 10
+c0 delay=3299 total=3299
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 71089,
+}
+size 12
+c0 delay=3016 total=3016
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 73112,
+}
+size 14
+c0 delay=3064 total=3064
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 73571,
+}
+size 16
+c0 delay=4187 total=4187
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 80912,
+}
+size 18
+c0 delay=3353 total=3353
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 86176,
+}
+size 20
+c0 delay=3126 total=3126
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 88012,
+}
+size 22
+c0 delay=3174 total=3174
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 96957,
+}
+size 24
+c0 delay=4486 total=4486
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 99950,
+}
+size 26
+c0 delay=4224 total=4224
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 111012,
+}
+size 28
+c0 delay=4346 total=4346
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 111225,
+}
+size 30
+c0 delay=4201 total=4201
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 111588,
+}
+size 32
+c0 delay=3443 total=3443
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 113143,
+}
+size 34
+c0 delay=9617 total=9617
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 117249,
+}
+size 36
+c0 delay=7733 total=7733
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 117331,
+}
+size 38
+c0 delay=4248 total=4248
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 118459,
+}
+size 40
+c0 delay=4231 total=4231
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 118754,
+}
+size 42
+c0 delay=3521 total=3521
+end
+id e46d9855-9452-46e9-863f-8868b5d16df5
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id f817014b-45d8-478c-900e-90e95c14d4aa
+459588e8a7c1fe1972990e5454f8d8e3
+420d53935968eea1db57c0ff143367
+1a0d9111098acf2ee9c8c32b0ff3d0
+220a5b570e92d0c56ea6b308
+f21b0d082d4c4337c70fe8933db30a8f
+1583935dcecd8c50ccb2f91e8a965600
+9297fc320acefa507c514b962978f2
+503a520cab49d0aaf43f9ba1c50d8886
+620982290631344db6426d
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 54746,
+}
+size 33
+c0 delay=12137 total=12137
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 55234,
+}
+size 35
+c0 delay=3596 total=3596
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 55770,
+}
+size 37
+c0 delay=3389 total=3389
+tool call:  Glob
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 55829,
+}
+size 39
+c0 delay=4372 total=4372
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 55911,
+}
+size 41
+c0 delay=6359 total=6359
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 55981,
+}
+size 43
+c0 delay=4579 total=4579
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 56068,
+}
+size 45
+c0 delay=6420 total=6420
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 56244,
+}
+size 47
+c0 delay=6966 total=6966
+tool call:  Glob
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 56411,
+}
+size 49
+c0 delay=3554 total=3554
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 56619,
+}
+size 51
+c0 delay=13751 total=13751
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 56764,
+}
+size 53
+c0 delay=8450 total=8450
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 57082,
+}
+size 55
+c0 delay=3534 total=3534
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 57818,
+}
+size 57
+c0 delay=9109 total=9109
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 58136,
+}
+size 59
+c0 delay=5325 total=5326
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 58592,
+}
+size 61
+c0 delay=2933 total=2933
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 58823,
+}
+size 63
+c0 delay=3126 total=3126
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 58975,
+}
+size 65
+c0 delay=3419 total=3419
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 59205,
+}
+size 67
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=10131 total=10131
+tool call:  Write
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 59838,
+}
+size 69
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=9784 total=9784
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 60472,
+}
+size 71
+c0 delay=3432 total=3432
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 60680,
+}
+size 73
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=3418 total=3418
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "5", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 60808,
+}
+size 75
+c0 delay=3570 total=3570
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "5", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 60950,
+}
+size 77
+c0 delay=4850 total=4850
+tool call:  Shell
+<-- chat 177853 [ "2", "idx" ]
+exec Shell {
+  command: "npm run validate:action-registry",
+  working_directory: "/Users/qingli/Projects/agent_servers/claude-uright",
+  description: "Run Swift/TS action registry parity validation",
+}
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 61064,
+}
+size 79
+c0 delay=2838 total=2838
+tool call:  Shell
+<-- chat 177853 [ "2", "idx" ]
+exec Shell {
+  command: "npm run electron:build:main",
+  working_directory: "/Users/qingli/Projects/agent_servers/claude-uright",
+  description: "Compile Electron main process TypeScript",
+}
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 61161,
+}
+size 81
+c0 delay=6888 total=6888
+tool call:  Shell
+<-- chat 177853 [ "2", "idx" ]
+exec Shell {
+  command: "git status --short",
+  working_directory: "/Users/qingli/Projects/agent_servers/claude-uright",
+  description: "Show changed files after P0 fixes",
+}
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 67018,
+}
+size 83
+c0 delay=5626 total=5626
+tool call:  ReadLints
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 67054,
+}
+size 85
+c0 delay=3042 total=3042
+tool call:  Write
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 68769,
+}
+size 87
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=4007 total=4007
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 69027,
+}
+size 89
+c0 delay=2323 total=2323
+end
+id 3911da3d-dbc1-4ee5-b73e-ad8aa596c892
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id f817014b-45d8-478c-900e-90e95c14d4aa
+4a0d9173b0375e67c8cf102b4f3715
+5a0be7ec0e8b1c75d59e4b08e3
+01f6155bfe81e07eb602039be2d02016
+e1c8753128a6804198bacaa0e6ba112c
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 62624,
+}
+size 87
+c0 delay=6410 total=6410
+tool call:  TodoWrite
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 63119,
+}
+size 89
+c0 delay=3492 total=3493
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 72064,
+}
+size 91
+c0 delay=5235 total=5235
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 73585,
+}
+size 93
+c0 delay=4850 total=4850
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 74808,
+}
+size 95
+c0 delay=5806 total=5806
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 74901,
+}
+size 97
+c0 delay=5137 total=5137
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 75023,
+}
+size 99
+c0 delay=3648 total=3648
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 75120,
+}
+size 101
+c0 delay=4905 total=4905
+tool call:  Glob
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 75375,
+}
+size 103
+c0 delay=5212 total=5212
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 75899,
+}
+size 105
+c0 delay=4197 total=4197
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 79172,
+}
+size 107
+c0 delay=4591 total=4591
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 79652,
+}
+size 109
+c0 delay=5480 total=5480
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 79725,
+}
+size 111
+c0 delay=3525 total=3525
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 102138,
+}
+size 113
+c0 delay=13138 total=13138
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 102249,
+}
+size 115
+c0 delay=17142 total=17142
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 102359,
+}
+size 117
+c0 delay=22387 total=22387
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 102726,
+}
+size 119
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=8128 total=8128
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 103708,
+}
+size 121
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=2981 total=2981
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 104158,
+}
+size 123
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=5840 total=5840
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 104323,
+}
+size 125
+c0 delay=18606 total=18606
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 104471,
+}
+size 127
+c0 delay=4029 total=4029
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 106429,
+}
+size 129
+c0 delay=5643 total=5643
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "5", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 106550,
+}
+size 131
+c0 delay=7027 total=7027
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 109909,
+}
+size 133
+id 239dc93c-924a-4925-a911-275d2f58ce29
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id 472af48e-e97d-44c3-bcb2-7f0a361bb311
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 22004,
+}
+size 4
+c0 delay=8863 total=8863
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 109980,
+}
+size 135
+c0 delay=3925 total=3925
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 30560,
+}
+size 6
+c0 delay=5167 total=5167
+c0 delay=8073 total=8073
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110094,
+}
+size 137
+tool call:  Write
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 31024,
+}
+size 8
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=2530 total=2530
+tool call:  Shell
+<-- chat 177853 [ "2", "idx" ]
+exec Shell {
+  command: "python3 scripts/sum_tokens.py temp.text",
+  working_directory: "/Users/qingli/Projects/agent_servers/claude-uright",
+  description: "Run token sum script on temp.text",
+}
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-sonnet-medium-thinking
+{
+  totalTokens: 31112,
+}
+size 10
+c0 delay=2208 total=2208
+end
+c0 delay=15522 total=15522
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110185,
+}
+size 139
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=4077 total=4077
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110276,
+}
+size 141
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=9103 total=9103
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110367,
+}
+size 143
+<-- chat 177853 [ "5", "idx" ]
+c0 delay=2847 total=2847
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110458,
+}
+size 145
+c0 delay=4807 total=4807
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110549,
+}
+size 147
+id 37a7d045-392d-44e9-a8d8-64e24a143e84
+========= start =========
+<-- chat 177853 [ "1", "idx" ]
+conversation_id 472af48e-e97d-44c3-bcb2-7f0a361bb311
+aa530dd9e5b9db5cc32f3f0bbd27f6af
+5a043dee418588ada3dcd16b816b
+card_type cursor
+model composer-2
+{
+  totalTokens: 22272,
+}
+size 9
+c0 delay=3811 total=3811
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110640,
+}
+size 149
+c0 delay=2009 total=2009
+c0 delay=4332 total=4332
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110731,
+}
+size 151
+c0 delay=5364 total=5364
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "5", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 110822,
+}
+size 153
+tool call:  Shell
+<-- chat 177853 [ "2", "idx" ]
+exec Shell {
+  command: "python3 - <<'PY'\nimport re, json\nfrom collections import defaultdict\nfrom pathlib import Path\n\npath = Path('temp.text')\ntext = path.read_text(encoding='utf-8', errors='ignore')\n\n# split into request-like blocks\nblocks = re.split(r'\\n(?=\\{\\\"timestamp\\\":)', text)\n\ntotal = 0\nentries = 0\nby_model = defaultdict(lambda: {'entries':0,'tokens':0})\nby_conv = defaultdict(lambda: {'entries':0,'tokens':0,'models':defaultdict(int)})\n\nfor b in blocks:\n    if '\"totalTokens\"' not in b:\n        continue\n    tm = re.search(r'\"totalTokens\"\\s*:\\s*(\\d+)', b)\n    if not tm:\n        continue\n    tokens = int(tm.group(1))\n    model_m = re.search(r'\"model\"\\s*:\\s*\"([^\"]+)\"', b)\n    conv_m = re.search(r'\"conversation_id\"\\s*:\\s*\"([^\"]+)\"', b)\n    model = model_m.group(1) if model_m else 'UNKNOWN'\n    conv = conv_m.group(1) if conv_m else 'UNKNOWN'\n\n    total += tokens\n    entries += 1\n\n    by_model[model]['entries'] += 1\n    by_model[model]['tokens'] += tokens\n\n    by_conv[conv]['entries'] += 1\n    by_conv[conv]['tokens'] += tokens\n    by_conv[conv]['models'][model] += tokens\n\nprint(f'entries={entries}')\nprint(f'total_tokens={total}')\nprint('\\n[by_model]')\nfor m, d in sorted(by_model.items(), key=lambda kv: kv[1]['tokens'], reverse=True):\n    print(f\"{m}\\tentries={d['entries']}\\ttokens={d['tokens']}\")\n\nprint('\\n[top_conversations_by_tokens]')\nfor conv, d in sorted(by_conv.items(), key=lambda kv: kv[1]['tokens'], reverse=True):\n    models = ', '.join(f\"{m}:{t}\" for m,t in sorted(d['models'].items(), key=lambda kv: kv[1], reverse=True))\n    print(f\"{conv}\\tentries={d['entries']}\\ttokens={d['tokens']}\\tmodels=[{models}]\")\nPY",
+  working_directory: "/Users/qingli/Projects/agent_servers/claude-uright",
+  description: "Parse temp.text and aggregate tokens by model and conversation",
+}
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model composer-2
+{
+  totalTokens: 22959,
+}
+size 11
+c0 delay=3864 total=3864
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 111939,
+}
+size 155
+c0 delay=2816 total=2816
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model composer-2
+{
+  totalTokens: 25642,
+}
+size 13
+c0 delay=4638 total=4638
+tool call:  Read
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 112637,
+}
+size 157
+c0 delay=13112 total=13112
+c0 delay=9517 total=9517
+tool call:  Shell
+<-- chat 177853 [ "2", "idx" ]
+exec Shell {
+  command: "python3 - <<'PY'\nimport re\nfrom collections import defaultdict\nfrom pathlib import Path\n\ntext = Path('temp.text').read_text(encoding='utf-8', errors='ignore')\n\n# Match each block from conversation_id ... model ... { totalTokens: N, }\npattern = re.compile(\n    r'conversation_id\\s+([^\\s]+)[\\s\\S]*?model\\s+([^\\s]+)[\\s\\S]*?totalTokens:\\s*(\\d+)',\n    re.MULTILINE\n)\n\nby_model = defaultdict(lambda: {'entries': 0, 'tokens': 0})\nby_conv = defaultdict(lambda: {'entries': 0, 'tokens': 0, 'models': defaultdict(int)})\n\ntotal_tokens = 0\nentries = 0\n\nfor conv, model, tok in pattern.findall(text):\n    t = int(tok)\n    entries += 1\n    total_tokens += t\n    by_model[model]['entries'] += 1\n    by_model[model]['tokens'] += t\n    by_conv[conv]['entries'] += 1\n    by_conv[conv]['tokens'] += t\n    by_conv[conv]['models'][model] += t\n\nprint(f'entries={entries}')\nprint(f'total_tokens={total_tokens}')\n\nprint('\\n[by_model]')\nfor m, d in sorted(by_model.items(), key=lambda kv: kv[1]['tokens'], reverse=True):\n    print(f\"{m}\\tentries={d['entries']}\\ttokens={d['tokens']}\")\n\nprint('\\n[by_conversation]')\nfor c, d in sorted(by_conv.items(), key=lambda kv: kv[1]['tokens'], reverse=True):\n    model_breakdown = ', '.join(\n        f\"{m}:{t}\" for m, t in sorted(d['models'].items(), key=lambda kv: kv[1], reverse=True)\n    )\n    print(f\"{c}\\tentries={d['entries']}\\ttokens={d['tokens']}\\tmodels=[{model_breakdown}]\")\nPY",
+  working_directory: "/Users/qingli/Projects/agent_servers/claude-uright",
+  description: "Aggregate temp.text token usage by model and conversation",
+}
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model composer-2
+{
+  totalTokens: 26375,
+}
+size 15
+c0 delay=2908 total=2908
+end
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 113675,
+}
+size 159
+c0 delay=3918 total=3918
+tool call:  Grep
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 114658,
+}
+size 161
+c0 delay=4815 total=4815
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 114810,
+}
+size 163
+c0 delay=3360 total=3360
+tool call:  StrReplace
+<-- chat 177853 [ "2", "idx" ]
+<-- chat 177853 [ "2", "idx" ]
+card_type cursor
+<-- chat 177853 [ "5", "idx" ]
+model claude-4.6-opus-high-thinking
+{
+  totalTokens: 114905,
+}
+size 165
+

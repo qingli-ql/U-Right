@@ -11,7 +11,9 @@
     "electron:dev:app": "wait-on electron/dist/main/main/index.js http-get://127.0.0.1:5187 && cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5187 electron electron/dist/main/main/index.js",
     "electron:build": "npm run electron:build:main && npm run electron:build:renderer",
     "electron:build:main": "tsc -p electron/tsconfig.node.json",
-    "electron:build:renderer": "vite build --config electron/vite.config.ts"
+    "electron:build:renderer": "vite build --config electron/vite.config.ts",
+    "generate:action-ids": "node scripts/generate_action_ids.js",
+    "validate:action-registry": "npm run generate:action-ids && node scripts/validate_action_registry.js"
   },
   "dependencies": {
     "react": "^19.1.0",

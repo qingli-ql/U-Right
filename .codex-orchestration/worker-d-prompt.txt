@@ -1,0 +1,31 @@
+你是 Worker D，负责把 Track B 的视图动作底座真正接入当前主线，并同步真实状态文档。先阅读这些文件和当前实现，再直接修改：
+- AGENTS.md
+- docs/project-progress.md
+- docs/action-implementation-status.md
+- docs/context-menu-mvp-implementation.md
+- docs/product-planning-settings-contextmenu-ai.md
+- electron/src/main/action-runner.ts
+- electron/src/main/finder-view-actions.ts
+- electron/src/shared/action-registry.ts
+- Sources/URightShared/ActionRegistry.swift
+
+你的唯一写入范围：
+- electron/src/main/action-runner.ts
+- docs/project-progress.md
+- docs/action-implementation-status.md
+- docs/context-menu-mvp-implementation.md
+
+任务目标：
+1. 把 `view.refresh` 和 `view.toggle-hidden` 接到 Electron 主线执行器
+2. 复用当前上下文路径归一化逻辑，确保目录选择合理
+3. 动作执行后给出清晰结果提示；失败时给出明确错误
+4. 根据真实落地情况更新 3 份状态文档
+5. 不要修改其它文件；不要回滚别人已做改动
+
+注意：仓库当前有未提交改动，你只能在上述文件内做最小增量，必须保留现有改动并在其基础上继续。
+
+完成后请给出：
+- 改了哪些文件
+- 具体接入了什么
+- 你建议主控重点复查什么
+- 是否已做过编译或其它验证

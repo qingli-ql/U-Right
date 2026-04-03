@@ -1,3 +1,0 @@
-module URightFinderExtension {
-    header "/Users/qingli/Projects/agent_servers/claude-uright/.build/arm64-apple-macosx/debug/URightFinderExtension.build/include/URightFinderExtension-Swift.h"
-}

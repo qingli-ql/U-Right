@@ -4,7 +4,7 @@ import URightShared
 @MainActor
 final class TemplateService {
     func availableTemplates() -> [TemplateDescriptor] {
-        BuiltInTemplates.all + customTemplates()
+        RuntimeTemplates.all(settings: SettingsStore.shared.load()) + customTemplates()
     }
 
     func createFile(using template: TemplateDescriptor, in directory: URL, promptTitle: String = "New File") throws -> URL? {
@@ -43,7 +43,7 @@ final class TemplateService {
     }
 
     private func customTemplates() -> [TemplateDescriptor] {
-        let folder = SettingsStore.shared.load().customTemplateFolder
+        let folder = SettingsStore.shared.load().templates.customTemplateFolder
         guard !folder.isEmpty else { return [] }
         let urls = (try? FileManager.default.contentsOfDirectory(at: URL(fileURLWithPath: folder, isDirectory: true), includingPropertiesForKeys: nil)) ?? []
         return urls.compactMap { url in

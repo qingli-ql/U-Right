@@ -3,8 +3,7 @@ import path from "node:path";
 
 const URIGHT_BRAND_SVG = `
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="512" height="512" fill="url(#panel)"/>
-  <rect x="20" y="20" width="472" height="472" rx="128" fill="url(#inner)"/>
+  <rect x="56" y="56" width="400" height="400" rx="104" fill="url(#inner)"/>
 
   <path d="M116 144H172V296C172 345 194 369 239 369C273 369 297 355 315 329L352 357C323 399 283 423 227 423C149 423 116 378 116 301V144Z" fill="#172327"/>
 
@@ -16,11 +15,7 @@ const URIGHT_BRAND_SVG = `
   <circle cx="420" cy="236" r="10" fill="#172327" opacity="0.5"/>
 
   <defs>
-    <linearGradient id="panel" x1="256" y1="0" x2="256" y2="512" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#D8B17A"/>
-      <stop offset="1" stop-color="#C28B4B"/>
-    </linearGradient>
-    <linearGradient id="inner" x1="256" y1="26" x2="256" y2="486" gradientUnits="userSpaceOnUse">
+    <linearGradient id="inner" x1="256" y1="56" x2="256" y2="456" gradientUnits="userSpaceOnUse">
       <stop stop-color="#F2DEC0"/>
       <stop offset="1" stop-color="#D8B27B"/>
     </linearGradient>

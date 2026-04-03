@@ -17,6 +17,32 @@ public final class FinderSyncExtension: FIFinderSync {
         }
     }
 
+    private func availableScriptNames() -> [String] {
+        let urls = (try? FileManager.default.contentsOfDirectory(at: SharedPaths.scriptsDirectory(), includingPropertiesForKeys: nil)) ?? []
+        return urls
+            .filter { $0.pathExtension != "" || FileManager.default.isExecutableFile(atPath: $0.path) }
+            .map(\.lastPathComponent)
+            .sorted()
+    }
+
+    private func persistMenuSnapshot(context: FinderActionContext, settings: AppSettings, descriptors: [ActionDescriptor]) {
+        let snapshotURL = SharedPaths.finderMenuSnapshotFileURL()
+        let snapshot = FinderMenuSnapshot(
+            appGroupIdentifier: URightConstants.appGroupIdentifier,
+            settingsVersion: SettingsStore.shared.currentDocumentVersionNumber(),
+            context: context,
+            menu: descriptors,
+            availability: ActionRegistry.snapshotAvailability(context: context, settings: settings)
+        )
+        do {
+            let data = try JSONEncoder().encode(snapshot)
+            try data.write(to: snapshotURL, options: .atomic)
+            Logger.shared.info("extension", "Persisted finder menu snapshot path=\(snapshotURL.path) selectionKind=\(context.selectionKind.rawValue) actionCount=\(descriptors.count)")
+        } catch {
+            Logger.shared.error("extension", "Failed to persist finder menu snapshot: \(error.localizedDescription)")
+        }
+    }
+
     public override init() {
         super.init()
         controller.directoryURLs = [URL(fileURLWithPath: "/")]
@@ -34,6 +60,7 @@ public final class FinderSyncExtension: FIFinderSync {
             "extension",
             "Build menu kind=\(menuKind.rawValue) selectionKind=\(context.selectionKind.rawValue) selectedCount=\(context.selectedURLs.count) primary=\(context.primaryURL?.path ?? "-") currentDir=\(context.currentDirectoryURL?.path ?? "-") actions=\(actionLabels)"
         )
+        persistMenuSnapshot(context: context, settings: settings, descriptors: descriptors)
         let menu = NSMenu(title: "U-Right")
         descriptors.forEach { descriptor in
             if let item = menuItem(for: descriptor, context: context) {
@@ -153,14 +180,78 @@ public final class FinderSyncExtension: FIFinderSync {
         }
 
         let metadata = selectedURLs.map(FileSystemHelper.metadata)
+        let resolvedPrimaryTarget = primaryURL
+        let resolvedSelectionDirectory: URL? = {
+            switch selectionKind {
+            case .file:
+                return primaryURL?.deletingLastPathComponent()
+            case .folder:
+                return primaryURL
+            case .empty:
+                return currentDirectoryURL
+            case .multi, .mixed:
+                let candidateDirectories = selectedURLs.map { url -> URL in
+                    let meta = FileSystemHelper.metadata(for: url)
+                    return meta.isDirectory ? url : url.deletingLastPathComponent()
+                }
+                let unique = Dictionary(grouping: candidateDirectories, by: \.path).compactMap(\.value.first)
+                if unique.count == 1 {
+                    return unique.first
+                }
+                return currentDirectoryURL ?? primaryURL?.deletingLastPathComponent()
+            }
+        }()
+        let resolvedTargetDirectory: URL? = {
+            switch selectionKind {
+            case .file:
+                return primaryURL?.deletingLastPathComponent()
+            case .folder:
+                return primaryURL
+            case .empty:
+                return currentDirectoryURL
+            case .multi, .mixed:
+                return currentDirectoryURL ?? resolvedSelectionDirectory
+            }
+        }()
+        let workingDirectory = {
+            switch selectionKind {
+            case .file:
+                return resolvedTargetDirectory
+            case .folder:
+                return resolvedTargetDirectory
+            case .empty:
+                return resolvedTargetDirectory
+            case .multi, .mixed:
+                return resolvedSelectionDirectory ?? resolvedTargetDirectory
+            }
+        }()
+        let writableTarget: Bool = {
+            // Finder Sync runs in a sandbox with read-only access to user-selected files.
+            // Using `isWritableFile` here under-reports real host-app write ability and hides
+            // valid actions such as create/rename/trash on ordinary project folders.
+            // Menu visibility should answer "is there a valid target the host app can act on?"
+            // while the Electron host performs the actual write permission check at execution time.
+            if !selectedURLs.isEmpty {
+                return true
+            }
+            return workingDirectory != nil
+        }()
         return FinderActionContext(
             selectedURLs: selectedURLs,
             primaryURL: primaryURL,
             currentDirectoryURL: currentDirectoryURL,
+            resolvedTargetDirectory: resolvedTargetDirectory,
+            resolvedPrimaryTarget: resolvedPrimaryTarget,
+            resolvedSelectionDirectory: resolvedSelectionDirectory,
             selectionKind: selectionKind,
             detectedTools: ToolDetector.shared.detect(),
             fileMetadata: metadata,
-            extensionWindowTitle: menuKind.rawValue.description
+            extensionWindowTitle: menuKind.rawValue.description,
+            capabilities: .init(
+                hasWorkingDirectory: workingDirectory != nil,
+                hasWritableTarget: writableTarget,
+                scriptNames: availableScriptNames()
+            )
         )
     }
 }

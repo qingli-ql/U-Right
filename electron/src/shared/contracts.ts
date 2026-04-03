@@ -52,30 +52,100 @@ export interface ToolPreference {
   allowMenuActions: boolean;
 }
 
-export interface AppSettings {
+export interface GeneralSettings {
   launchAtLogin: boolean;
   showMenuBarIcon: boolean;
   showExtensionStatus: boolean;
+}
+
+export interface IntegrationSettings {
   defaultTerminal: ToolKind;
   defaultEditor: ToolKind;
-  aiEnabled: boolean;
-  preferredAIProvider: AIProvider;
+  toolPreferences: ToolPreference[];
+  customExecutablePaths: Record<string, string>;
+}
+
+export interface UserTemplateItem {
+  id: string;
+  name: string;
+  fileExtension: string;
+  defaultFileName: string;
+  starterContent: string;
+  makeExecutable: boolean;
+  isEnabled: boolean;
+  sortOrder: number;
+}
+
+export interface ExtensionTemplateDefault {
+  fileExtension: string;
+  templateID: string;
+}
+
+export interface TemplateSettings {
+  customTemplateFolder: string;
+  userTemplates: UserTemplateItem[];
+  extensionDefaults: ExtensionTemplateDefault[];
+}
+
+export interface AIProfile {
+  id: string;
+  name: string;
+  provider: AIProvider;
   apiBaseURL: string;
   apiKey: string;
   apiModel: string;
+  isEnabled: boolean;
+}
+
+export interface PromptPolicy {
+  id: string;
+  name: string;
   systemPromptTemplate: string;
   maxContextFileSize: number;
   maxFolderScanDepth: number;
   includeHiddenFiles: boolean;
-  customTemplateFolder: string;
+}
+
+export interface AISettings {
+  enabled: boolean;
+  preferredProvider: AIProvider;
+  profiles: AIProfile[];
+  defaultProfileID?: string | null;
+  promptPolicies: PromptPolicy[];
+  defaultPromptPolicyID?: string | null;
+  actionVisibility: string[];
+}
+
+export interface CustomOpenAction {
+  id: string;
+  name: string;
+  appPath: string;
+  bundleIdentifier?: string | null;
+  targetKind: "file" | "folder" | "any";
+  isEnabled: boolean;
+  sortOrder: number;
+  category: ActionCategory;
+}
+
+export interface CustomActionSettings {
+  openActions: CustomOpenAction[];
+}
+
+export interface AdvancedSettings {
   debugLogging: boolean;
-  customExecutablePaths: Record<string, string>;
+}
+
+export interface AppSettings {
   pinnedActionIDs: string[];
   recentActionIDs: string[];
   lastAIActionID?: string | null;
   contextMenu: ContextMenuSettings;
-  toolPreferences: ToolPreference[];
-  aiActionVisibility: string[];
+  general: GeneralSettings;
+  integrations: IntegrationSettings;
+  templates: TemplateSettings;
+  ai: AISettings;
+  customActions: CustomActionSettings;
+  advanced: AdvancedSettings;
 }
 
 export interface ToolAvailability {
@@ -94,14 +164,24 @@ export interface FileMetadata {
   isScriptLike: boolean;
 }
 
+export interface FinderContextCapabilities {
+  hasWorkingDirectory: boolean;
+  hasWritableTarget: boolean;
+  scriptNames?: string[];
+}
+
 export interface FinderActionContext {
   selectedURLs: string[];
   primaryURL?: string | null;
   currentDirectoryURL?: string | null;
+  resolvedTargetDirectory?: string | null;
+  resolvedPrimaryTarget?: string | null;
+  resolvedSelectionDirectory?: string | null;
   selectionKind: SelectionKind;
   detectedTools: Partial<Record<ToolKind, ToolAvailability>>;
   fileMetadata: FileMetadata[];
   extensionWindowTitle?: string | null;
+  capabilities?: FinderContextCapabilities;
 }
 
 export interface ActionRequest {
@@ -117,6 +197,49 @@ export interface StoredSettingsDocument {
   settings: AppSettings;
 }
 
+export interface SettingsHistorySnapshot {
+  updatedAt: string;
+  settings: AppSettings;
+}
+
+export interface AppDiagnostics {
+  appGroupIdentifier: string;
+  sharedRoot: string;
+  settingsFile: string;
+  settingsVersion: number;
+  settingsUpdatedAt?: string | null;
+  candidateGroupContainers: string[];
+  warning?: string | null;
+  errors?: string[];
+  availableScriptNames?: string[];
+  finderMenuSnapshot?: FinderMenuSnapshot | null;
+}
+
+export interface FinderMenuSnapshotAction {
+  id: string;
+  title: string;
+  isEnabled: boolean;
+  statusBadge?: string | null;
+  children: FinderMenuSnapshotAction[];
+}
+
+export interface FinderMenuSnapshotAvailability {
+  actionID: string;
+  title: string;
+  isVisible: boolean;
+  isEnabled: boolean;
+  reason?: string | null;
+}
+
+export interface FinderMenuSnapshot {
+  updatedAt: string;
+  appGroupIdentifier: string;
+  settingsVersion?: number | null;
+  context: FinderActionContext;
+  menu: FinderMenuSnapshotAction[];
+  availability?: FinderMenuSnapshotAvailability[];
+}
+
 export type WindowKind = "settings" | "result" | "prompt" | "logs" | "onboarding";
 
 export interface PromptWindowPayload {
@@ -125,6 +248,8 @@ export interface PromptWindowPayload {
   defaultValue: string;
   mode: "singleline" | "multiline";
   submitLabel: string;
+  variant?: "compact" | "full";
+  placeholder?: string;
   confirmLabel?: string;
   isDestructive?: boolean;
 }

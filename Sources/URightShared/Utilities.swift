@@ -101,6 +101,10 @@ public enum SharedPaths {
         appGroupContainerURL().appendingPathComponent(URightConstants.devHostStateFileName)
     }
 
+    public static func finderMenuSnapshotFileURL() -> URL {
+        appGroupContainerURL().appendingPathComponent(URightConstants.finderMenuSnapshotFileName)
+    }
+
     public static func builtInTemplatesDirectory() -> URL {
         let directory = appGroupContainerURL().appendingPathComponent(URightConstants.templateDirectoryName, isDirectory: true)
         createDirectory(at: directory, purpose: "templates")

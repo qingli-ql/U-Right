@@ -13,4 +13,16 @@ Certificates/
 build/
 dist/
 tmp/
+.build/
+.swiftpm/
+DerivedData/
+
+# Xcode / Swift user state
+*.xcuserstate
+xcuserdata/
+
+# Node / Electron outputs
+node_modules/
+electron/dist/
+
 .DS_Store

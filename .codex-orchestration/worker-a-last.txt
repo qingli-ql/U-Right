@@ -1,0 +1,18 @@
+**已改文件**
+- `electron/src/main/action-runner.ts:96`、`electron/src/main/action-runner.ts:472`
+- `electron/src/shared/action-registry.ts:110`
+- `Sources/URightShared/ActionRegistry.swift:75`
+
+**具体实现**
+- 在 `electron/src/main/action-runner.ts:96` 新增 `contextSingleTargetPath()`，优先取归一化后的 `primaryURL`，缺失时回退到单个 `selectedURLs`，避免菜单可见但执行端因 `primaryURL` 缺失而空跑。
+- 在 `electron/src/main/action-runner.ts:472` 将 `copy.filename`、`copy.basename`、`copy.extension` 统一接到该单目标路径逻辑，继续沿用现有路径归一化与单文件上下文规则。
+- 在 `electron/src/shared/action-registry.ts:110` 和 `Sources/URightShared/ActionRegistry.swift:75` 把这 3 个动作明确标为 `implemented` 且 `defaultVisible: true`，让 Finder 菜单 / Settings Preview / Electron executor 的默认暴露语义显式一致。
+
+**建议主控重点复查**
+- 文件单选且 `primaryURL` 缺失、仅有 `selectedURLs` 时，这 3 个动作是否仍正常复制。
+- 无扩展名文件、点文件（如 `.gitignore`）、多后缀文件（如 `a.test.ts`）的 basename / extension 输出是否符合产品预期。
+- Settings 里关闭这 3 个动作后，Finder 菜单和 Preview 是否同步隐藏。
+
+**未完成边角**
+- 没改文档状态文件；如果主控需要让文档与代码完全同步，需由可写该范围的人补 `docs/*.md`。
+- 这次未跑构建/回归，只做了限定文件内最小实现与 diff 自查。

@@ -1,5 +1,8 @@
 # Claude Code 项目配置指南
 
+> 说明：这是一份 Claude / agent 配置参考文档，不是当前产品实现主文档。  
+> 当前产品状态、设计原则和下一步 TODO 以 `README.md`、`docs/project-progress.md`、`docs/product-planning-settings-contextmenu-ai.md` 为准。
+
 这份文档不是在讲“Claude 是什么”，而是在讲：对于你这个 macOS Finder 超级右键工具项目，应该怎样配置 Claude Code，哪些文件该放哪里，哪些能力最值得先用，什么时候该上 subagents、skills、agent teams，哪些先别上。
 
 目标读者是“项目整体开发经验还不多，但希望用 Claude Code 稳定推进项目”的你。
