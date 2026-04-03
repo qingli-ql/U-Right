@@ -6,6 +6,8 @@
 [![AI](https://img.shields.io/badge/AI-Claude%20%2F%20Codex%20Ready-FF6B6B)](#核心优势)
 [![Status](https://img.shields.io/badge/status-hardening-8B5CF6)](#当前产品形态)
 
+**Finder-native super context menu for macOS, with AI actions, templates, scripts, and tool shortcuts.**
+
 U-Right 是一个面向 macOS Finder 的超级右键工具，目标是在 Finder 原生上下文里，提供稳定、可配置、可扩展的高频文件操作与 AI 辅助能力。
 
 它不是“再做一个文件管理器”，而是把真正高频、真正有价值的能力放回 Finder 右键这一跳里，让用户少切窗口、少找工具、少重复操作。
