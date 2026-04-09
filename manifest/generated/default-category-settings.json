@@ -1,0 +1,52 @@
+{
+  "categorySettings": [
+    {
+      "category": "create",
+      "isEnabled": true,
+      "order": 0,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "open",
+      "isEnabled": true,
+      "order": 10,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "clipboard",
+      "isEnabled": true,
+      "order": 20,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "fileOps",
+      "isEnabled": true,
+      "order": 30,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "view",
+      "isEnabled": true,
+      "order": 40,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "ai",
+      "isEnabled": true,
+      "order": 50,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "git",
+      "isEnabled": true,
+      "order": 60,
+      "displayStyle": "submenu"
+    },
+    {
+      "category": "scripts",
+      "isEnabled": true,
+      "order": 70,
+      "displayStyle": "submenu"
+    }
+  ]
+}

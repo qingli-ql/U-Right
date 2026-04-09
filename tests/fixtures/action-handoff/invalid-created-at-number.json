@@ -1,0 +1,22 @@
+{
+  "id": "0B50A5A9-5F72-4E16-B7A3-9B193C2D8E10",
+  "actionID": "open.vscode",
+  "createdAt": 1712534400.123,
+  "context": {
+    "selectedURLs": ["/Users/example/Projects/U Right 示例/含 空格"],
+    "primaryURL": "/Users/example/Projects/U Right 示例/含 空格",
+    "currentDirectoryURL": "/Users/example/Projects/U Right 示例",
+    "resolvedTargetDirectory": "/Users/example/Projects/U Right 示例/含 空格",
+    "resolvedPrimaryTarget": "/Users/example/Projects/U Right 示例/含 空格",
+    "resolvedSelectionDirectory": "/Users/example/Projects/U Right 示例",
+    "selectionKind": "folder",
+    "detectedTools": {},
+    "fileMetadata": [],
+    "extensionWindowTitle": "U-Right",
+    "capabilities": {
+      "hasWorkingDirectory": true,
+      "hasWritableTarget": true,
+      "scriptNames": []
+    }
+  }
+}

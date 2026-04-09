@@ -1,0 +1,9 @@
+{
+  "expectedDefaults": {
+    "defaultVisibleAIActionIDs": ["ai.ask-claude", "ai.ask-codex"],
+    "promotedActionVisibilityGroups": [
+      ["copy.filename", "copy.basename", "copy.extension"],
+      ["view.toggle-hidden", "view.refresh"]
+    ]
+  }
+}

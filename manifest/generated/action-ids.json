@@ -1,0 +1,226 @@
+{
+  "actionIDs": [
+    "create.new-file",
+    "create.new-folder",
+    "submenu.templates",
+    "open.terminal",
+    "open.vscode",
+    "open.cursor",
+    "open.zed",
+    "open.ghostty",
+    "copy.path",
+    "copy.relative-path",
+    "copy.filename",
+    "copy.basename",
+    "copy.extension",
+    "finder.reveal",
+    "file.rename",
+    "file.trash",
+    "file.duplicate",
+    "file.compress",
+    "file.json-format",
+    "file.toggle-executable",
+    "git.status",
+    "ai.ask-claude",
+    "ai.ask-codex",
+    "ai.explain-project",
+    "ai.summarize-files",
+    "ai.generate-readme",
+    "ai.generate-gitignore",
+    "ai.review-code",
+    "ai.refactor-file",
+    "ai.write-tests",
+    "ai.explain-error",
+    "ai.json-schema",
+    "ai.commit-message",
+    "ai.pr-summary",
+    "ai.summarize-selection",
+    "ai.ask-selection",
+    "ai.repeat-last",
+    "submenu.scripts",
+    "view.toggle-hidden",
+    "view.refresh",
+    "folder.search",
+    "folder.size",
+    "folder.count",
+    "multi.batch-rename"
+  ],
+  "swiftActionIDConstants": [
+    {
+      "id": "ai.ask-claude",
+      "name": "aiAskClaude"
+    },
+    {
+      "id": "ai.ask-codex",
+      "name": "aiAskCodex"
+    },
+    {
+      "id": "ai.ask-selection",
+      "name": "aiAskSelection"
+    },
+    {
+      "id": "ai.commit-message",
+      "name": "aiCommitMessage"
+    },
+    {
+      "id": "ai.explain-error",
+      "name": "aiExplainError"
+    },
+    {
+      "id": "ai.explain-project",
+      "name": "aiExplainProject"
+    },
+    {
+      "id": "ai.generate-gitignore",
+      "name": "aiGenerateGitignore"
+    },
+    {
+      "id": "ai.generate-readme",
+      "name": "aiGenerateReadme"
+    },
+    {
+      "id": "ai.json-schema",
+      "name": "aiJSONSchema"
+    },
+    {
+      "id": "ai.pr-summary",
+      "name": "aiPRSummary"
+    },
+    {
+      "id": "ai.refactor-file",
+      "name": "aiRefactorFile"
+    },
+    {
+      "id": "ai.repeat-last",
+      "name": "repeatLastAIAction"
+    },
+    {
+      "id": "ai.review-code",
+      "name": "aiReviewCode"
+    },
+    {
+      "id": "ai.summarize-files",
+      "name": "aiSummarizeFiles"
+    },
+    {
+      "id": "ai.summarize-selection",
+      "name": "aiSummarizeSelection"
+    },
+    {
+      "id": "ai.write-tests",
+      "name": "aiWriteTests"
+    },
+    {
+      "id": "copy.basename",
+      "name": "copyBasename"
+    },
+    {
+      "id": "copy.extension",
+      "name": "copyExtension"
+    },
+    {
+      "id": "copy.filename",
+      "name": "copyFilename"
+    },
+    {
+      "id": "copy.path",
+      "name": "copyPath"
+    },
+    {
+      "id": "copy.relative-path",
+      "name": "copyRelativePath"
+    },
+    {
+      "id": "create.new-file",
+      "name": "newFile"
+    },
+    {
+      "id": "create.new-folder",
+      "name": "newFolder"
+    },
+    {
+      "id": "file.compress",
+      "name": "compress"
+    },
+    {
+      "id": "file.duplicate",
+      "name": "duplicate"
+    },
+    {
+      "id": "file.json-format",
+      "name": "jsonFormat"
+    },
+    {
+      "id": "file.rename",
+      "name": "rename"
+    },
+    {
+      "id": "file.toggle-executable",
+      "name": "toggleExecutable"
+    },
+    {
+      "id": "file.trash",
+      "name": "trash"
+    },
+    {
+      "id": "finder.reveal",
+      "name": "revealInFinder"
+    },
+    {
+      "id": "folder.count",
+      "name": "countItems"
+    },
+    {
+      "id": "folder.search",
+      "name": "searchInFolder"
+    },
+    {
+      "id": "folder.size",
+      "name": "folderSize"
+    },
+    {
+      "id": "git.status",
+      "name": "gitStatus"
+    },
+    {
+      "id": "multi.batch-rename",
+      "name": "batchRename"
+    },
+    {
+      "id": "open.cursor",
+      "name": "openCursor"
+    },
+    {
+      "id": "open.ghostty",
+      "name": "openGhostty"
+    },
+    {
+      "id": "open.terminal",
+      "name": "openTerminal"
+    },
+    {
+      "id": "open.vscode",
+      "name": "openVSCode"
+    },
+    {
+      "id": "open.zed",
+      "name": "openZed"
+    },
+    {
+      "id": "submenu.scripts",
+      "name": "submenuScripts"
+    },
+    {
+      "id": "submenu.templates",
+      "name": "submenuTemplates"
+    },
+    {
+      "id": "view.refresh",
+      "name": "refresh"
+    },
+    {
+      "id": "view.toggle-hidden",
+      "name": "showHidden"
+    }
+  ]
+}

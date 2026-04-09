@@ -67,6 +67,12 @@ public enum FileSystemHelper {
 }
 
 public enum SharedPaths {
+    public enum PreferredHostRuntime: String {
+        case nativeApp = "native-app"
+        case electronDev = "electron-dev"
+        case electronApp = "electron-app"
+    }
+
     private static func createDirectory(at url: URL, purpose: String) {
         do {
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
@@ -80,16 +86,38 @@ public enum SharedPaths {
         if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier) {
             return url
         }
-        let fallback = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("Library/Application Support/\(URightConstants.appName)", isDirectory: true)
-        DiagnosticLogger.emit("Falling back to Application Support path appGroup=\(appGroupIdentifier) path=\(fallback.path)")
-        createDirectory(at: fallback, purpose: "fallback app support")
-        return fallback
+        fatalError(
+            "App group container is unavailable for \(appGroupIdentifier). Ensure Host and Finder Extension are signed with the same app group."
+        )
     }
 
     public static func requestsDirectory() -> URL {
         let directory = appGroupContainerURL().appendingPathComponent(URightConstants.requestDirectoryName, isDirectory: true)
         createDirectory(at: directory, purpose: "requests")
+        return directory
+    }
+
+    public static func incomingRequestsDirectory() -> URL {
+        let directory = requestsDirectory().appendingPathComponent(URightConstants.requestIncomingDirectoryName, isDirectory: true)
+        createDirectory(at: directory, purpose: "incoming requests")
+        return directory
+    }
+
+    public static func processingRequestsDirectory() -> URL {
+        let directory = requestsDirectory().appendingPathComponent(URightConstants.requestProcessingDirectoryName, isDirectory: true)
+        createDirectory(at: directory, purpose: "processing requests")
+        return directory
+    }
+
+    public static func completedRequestsDirectory() -> URL {
+        let directory = requestsDirectory().appendingPathComponent(URightConstants.requestDoneDirectoryName, isDirectory: true)
+        createDirectory(at: directory, purpose: "completed requests")
+        return directory
+    }
+
+    public static func failedRequestsDirectory() -> URL {
+        let directory = requestsDirectory().appendingPathComponent(URightConstants.requestFailedDirectoryName, isDirectory: true)
+        createDirectory(at: directory, purpose: "failed requests")
         return directory
     }
 
@@ -99,6 +127,10 @@ public enum SharedPaths {
 
     public static func devHostStateFileURL() -> URL {
         appGroupContainerURL().appendingPathComponent(URightConstants.devHostStateFileName)
+    }
+
+    public static func preferredHostRuntimeFileURL() -> URL {
+        appGroupContainerURL().appendingPathComponent(URightConstants.preferredHostRuntimeFileName)
     }
 
     public static func finderMenuSnapshotFileURL() -> URL {
@@ -134,5 +166,52 @@ public enum SharedPaths {
         try? FileManager.default.removeItem(at: url)
         DiagnosticLogger.emit("Removed stale dev host marker at \(url.path) pid=\(pid)")
         return false
+    }
+
+    public static func preferredHostRuntime() -> PreferredHostRuntime? {
+        let url = preferredHostRuntimeFileURL()
+        guard
+            let data = try? Data(contentsOf: url),
+            let payload = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let rawValue = payload["runtime"] as? String
+        else {
+            return nil
+        }
+        return PreferredHostRuntime(rawValue: rawValue)
+    }
+
+    public static func writePreferredHostRuntime(_ runtime: PreferredHostRuntime) {
+        let url = preferredHostRuntimeFileURL()
+        let payload: [String: Any] = [
+            "runtime": runtime.rawValue,
+            "updatedAt": ISO8601DateFormatter().string(from: Date())
+        ]
+        guard let data = try? JSONSerialization.data(withJSONObject: payload, options: [.prettyPrinted]) else {
+            DiagnosticLogger.emit("Failed to encode preferred host runtime payload runtime=\(runtime.rawValue)")
+            return
+        }
+        do {
+            try data.write(to: url, options: .atomic)
+        } catch {
+            DiagnosticLogger.emit("Failed to write preferred host runtime runtime=\(runtime.rawValue) path=\(url.path) error=\(error.localizedDescription)")
+        }
+    }
+}
+
+public enum HostWakePolicy {
+    public enum Decision: String {
+        case skipActiveDevHost = "skip-active-dev-host"
+        case wakeInstalledHost = "wake-installed-host"
+    }
+
+    public static func decision(
+        hasActiveDevHost: Bool = SharedPaths.hasActiveDevHost(),
+        preferredRuntime: SharedPaths.PreferredHostRuntime? = SharedPaths.preferredHostRuntime()
+    ) -> Decision {
+        if hasActiveDevHost {
+            return .skipActiveDevHost
+        }
+        _ = preferredRuntime
+        return .wakeInstalledHost
     }
 }

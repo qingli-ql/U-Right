@@ -1,5 +1,5 @@
 // AUTO-GENERATED FILE. DO NOT EDIT.
-// Source of truth: electron/src/shared/action-registry.ts (ACTION_DEFINITIONS)
+// Source of truth: manifest/actions.json
 
 import Foundation
 
@@ -43,10 +43,10 @@ public enum ActionIDs {
     public static let gitStatus = "git.status"
     public static let batchRename = "multi.batch-rename"
     public static let openCursor = "open.cursor"
+    public static let openGhostty = "open.ghostty"
     public static let openTerminal = "open.terminal"
     public static let openVSCode = "open.vscode"
     public static let openZed = "open.zed"
-    public static let openGhostty = "open.ghostty"
     public static let submenuScripts = "submenu.scripts"
     public static let submenuTemplates = "submenu.templates"
     public static let refresh = "view.refresh"

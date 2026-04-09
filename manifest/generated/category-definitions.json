@@ -1,0 +1,60 @@
+{
+  "categories": [
+    {
+      "category": "create",
+      "title": "Create",
+      "systemImageName": "plus.square.on.square",
+      "defaultOrder": 0,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "open",
+      "title": "Open",
+      "systemImageName": "square.and.arrow.up",
+      "defaultOrder": 10,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "clipboard",
+      "title": "Clipboard",
+      "systemImageName": "document.on.document",
+      "defaultOrder": 20,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "fileOps",
+      "title": "File",
+      "systemImageName": "folder",
+      "defaultOrder": 30,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "view",
+      "title": "View",
+      "systemImageName": "eye",
+      "defaultOrder": 40,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "ai",
+      "title": "AI",
+      "systemImageName": "sparkles",
+      "defaultOrder": 50,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "git",
+      "title": "Git",
+      "systemImageName": "point.topleft.down.curvedto.point.bottomright.up",
+      "defaultOrder": 60,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "scripts",
+      "title": "Scripts",
+      "systemImageName": "terminal",
+      "defaultOrder": 70,
+      "defaultDisplayStyle": "submenu"
+    }
+  ]
+}

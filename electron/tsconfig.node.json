@@ -12,5 +12,5 @@
     "types": ["node", "electron"],
     "lib": ["ES2022"]
   },
-  "include": ["src/main/**/*.ts", "src/shared/**/*.ts"]
+  "include": ["src/main/**/*.ts", "src/contracts/**/*.ts", "src/domain/**/*.ts"]
 }

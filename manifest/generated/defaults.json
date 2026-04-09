@@ -1,0 +1,39 @@
+{
+  "selectionKinds": [
+    "file",
+    "folder",
+    "mixed",
+    "empty",
+    "multi"
+  ],
+  "toolOrder": [
+    "terminal",
+    "ghostty",
+    "iTerm",
+    "vscode",
+    "cursor",
+    "zed",
+    "claude",
+    "codex",
+    "gh",
+    "lazygit",
+    "gitup"
+  ],
+  "defaults": {
+    "defaultVisibleAIActionIDs": [
+      "ai.ask-claude",
+      "ai.ask-codex"
+    ],
+    "promotedActionVisibilityGroups": [
+      [
+        "copy.filename",
+        "copy.basename",
+        "copy.extension"
+      ],
+      [
+        "view.toggle-hidden",
+        "view.refresh"
+      ]
+    ]
+  }
+}

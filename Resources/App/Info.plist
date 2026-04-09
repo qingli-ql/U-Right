@@ -26,5 +26,7 @@
     <string>OpenAI Prototype</string>
     <key>URightAppGroupIdentifier</key>
     <string>$(APP_GROUP_IDENTIFIER)</string>
+    <key>URightHostRuntime</key>
+    <string>electron</string>
 </dict>
 </plist>

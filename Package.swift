@@ -12,6 +12,21 @@ let package = Package(
         .target(
             name: "URightShared",
             path: "Sources/URightShared"
+        ),
+        .executableTarget(
+            name: "ActionHandoffFixtureEmitter",
+            dependencies: ["URightShared"],
+            path: "tools/swift/action-handoff-fixture-emitter"
+        ),
+        .executableTarget(
+            name: "RuntimeParityEmitter",
+            dependencies: ["URightShared"],
+            path: "tools/swift/runtime-parity-emitter"
+        ),
+        .testTarget(
+            name: "URightSharedTests",
+            dependencies: ["URightShared"],
+            path: "Tests/URightSharedTests"
         )
     ]
 )

@@ -1,0 +1,687 @@
+{
+  "version": 1,
+  "selectionKinds": ["file", "folder", "mixed", "empty", "multi"],
+  "toolOrder": [
+    "terminal",
+    "ghostty",
+    "iTerm",
+    "vscode",
+    "cursor",
+    "zed",
+    "claude",
+    "codex",
+    "gh",
+    "lazygit",
+    "gitup"
+  ],
+  "defaults": {
+    "defaultVisibleAIActionIDs": ["ai.ask-claude", "ai.ask-codex"],
+    "promotedActionVisibilityGroups": [
+      ["copy.filename", "copy.basename", "copy.extension"],
+      ["view.toggle-hidden", "view.refresh"]
+    ]
+  },
+  "categories": [
+    {
+      "category": "create",
+      "title": "Create",
+      "systemImageName": "plus.square.on.square",
+      "defaultOrder": 0,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "open",
+      "title": "Open",
+      "systemImageName": "square.and.arrow.up",
+      "defaultOrder": 10,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "clipboard",
+      "title": "Clipboard",
+      "systemImageName": "document.on.document",
+      "defaultOrder": 20,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "fileOps",
+      "title": "File",
+      "systemImageName": "folder",
+      "defaultOrder": 30,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "view",
+      "title": "View",
+      "systemImageName": "eye",
+      "defaultOrder": 40,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "ai",
+      "title": "AI",
+      "systemImageName": "sparkles",
+      "defaultOrder": 50,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "git",
+      "title": "Git",
+      "systemImageName": "point.topleft.down.curvedto.point.bottomright.up",
+      "defaultOrder": 60,
+      "defaultDisplayStyle": "submenu"
+    },
+    {
+      "category": "scripts",
+      "title": "Scripts",
+      "systemImageName": "terminal",
+      "defaultOrder": 70,
+      "defaultDisplayStyle": "submenu"
+    }
+  ],
+  "actions": [
+    {
+      "id": "create.new-file",
+      "title": "New File...",
+      "systemImageName": "plus.square.on.square",
+      "defaultCategory": "create",
+      "supportedContexts": ["file", "folder", "empty"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "requiresDirectoryContext": true
+      }
+    },
+    {
+      "id": "create.new-folder",
+      "title": "New Folder",
+      "systemImageName": "folder.badge.plus",
+      "defaultCategory": "create",
+      "supportedContexts": ["file", "folder", "empty"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 10,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "requiresDirectoryContext": true
+      }
+    },
+    {
+      "id": "submenu.templates",
+      "title": "New From Template",
+      "systemImageName": "doc.badge.plus",
+      "defaultCategory": "create",
+      "supportedContexts": ["file", "folder", "empty"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 20,
+      "defaultVisible": true,
+      "childrenPolicy": "builtInTemplates",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "requiresDirectoryContext": true
+      }
+    },
+    {
+      "id": "open.terminal",
+      "title": "Open in Terminal",
+      "systemImageName": "terminal",
+      "defaultCategory": "open",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiredTool": "terminal"
+      }
+    },
+    {
+      "id": "open.vscode",
+      "title": "Open in VS Code",
+      "systemImageName": "chevron.left.forwardslash.chevron.right",
+      "defaultCategory": "open",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 10,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiredTool": "vscode"
+      }
+    },
+    {
+      "id": "open.cursor",
+      "title": "Open in Cursor",
+      "systemImageName": "cursorarrow.rays",
+      "defaultCategory": "open",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 20,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiredTool": "cursor"
+      }
+    },
+    {
+      "id": "open.zed",
+      "title": "Open in Zed",
+      "systemImageName": "bolt.badge.a",
+      "defaultCategory": "open",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 30,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiredTool": "zed"
+      }
+    },
+    {
+      "id": "open.ghostty",
+      "title": "Open in Ghostty",
+      "systemImageName": "terminal",
+      "defaultCategory": "open",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 40,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiredTool": "ghostty"
+      }
+    },
+    {
+      "id": "copy.path",
+      "title": "Copy Path",
+      "systemImageName": "document.on.document",
+      "defaultCategory": "clipboard",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "copy.relative-path",
+      "title": "Copy Relative Path",
+      "systemImageName": "arrowshape.turn.up.backward.2",
+      "defaultCategory": "clipboard",
+      "supportedContexts": ["file", "folder", "multi"],
+      "implementationStatus": "beta",
+      "defaultOrder": 10,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "copy.filename",
+      "title": "Copy Filename",
+      "systemImageName": "textformat.characters",
+      "defaultCategory": "clipboard",
+      "supportedContexts": ["file"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 20,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "copy.basename",
+      "title": "Copy Basename",
+      "systemImageName": "character.textbox",
+      "defaultCategory": "clipboard",
+      "supportedContexts": ["file"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 30,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "copy.extension",
+      "title": "Copy Extension",
+      "systemImageName": "tag",
+      "defaultCategory": "clipboard",
+      "supportedContexts": ["file"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 40,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "finder.reveal",
+      "title": "Reveal in Finder",
+      "systemImageName": "finder",
+      "defaultCategory": "view",
+      "supportedContexts": ["file", "folder", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "file.rename",
+      "title": "Rename",
+      "systemImageName": "pencil",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["file", "folder"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "requiresSingleSelection": true,
+        "needsConfirmation": true
+      }
+    },
+    {
+      "id": "file.trash",
+      "title": "Move to Trash",
+      "systemImageName": "trash",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["file", "folder", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 10,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "isDestructive": true,
+        "needsConfirmation": true
+      }
+    },
+    {
+      "id": "file.duplicate",
+      "title": "Duplicate",
+      "systemImageName": "plus.square.on.square",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["file", "folder", "multi"],
+      "implementationStatus": "beta",
+      "defaultOrder": 20,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true
+      }
+    },
+    {
+      "id": "file.compress",
+      "title": "Compress",
+      "systemImageName": "archivebox",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["file", "folder", "multi"],
+      "implementationStatus": "beta",
+      "defaultOrder": 30,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true
+      }
+    },
+    {
+      "id": "file.json-format",
+      "title": "JSON Format",
+      "systemImageName": "curlybraces",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["file"],
+      "implementationStatus": "beta",
+      "defaultOrder": 40,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "requiresSingleSelection": true,
+        "needsConfirmation": true
+      }
+    },
+    {
+      "id": "file.toggle-executable",
+      "title": "Toggle Executable Bit",
+      "systemImageName": "switch.2",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["file"],
+      "implementationStatus": "beta",
+      "defaultOrder": 50,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresWritableTarget": true,
+        "requiresSingleSelection": true,
+        "needsConfirmation": true
+      }
+    },
+    {
+      "id": "git.status",
+      "title": "Open Git Status Here",
+      "systemImageName": "point.topleft.down.curvedto.point.bottomright.up",
+      "defaultCategory": "git",
+      "supportedContexts": ["file", "folder", "empty"],
+      "implementationStatus": "beta",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresDirectoryContext": true
+      }
+    },
+    {
+      "id": "ai.ask-claude",
+      "title": "Ask Claude About This",
+      "systemImageName": "sparkles",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.ask-codex",
+      "title": "Ask Codex About This",
+      "systemImageName": "brain",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "implemented",
+      "defaultOrder": 10,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.explain-project",
+      "title": "Explain This Project",
+      "systemImageName": "folder.badge.questionmark",
+      "defaultCategory": "ai",
+      "supportedContexts": ["folder", "empty", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 20,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.summarize-files",
+      "title": "Summarize Files",
+      "systemImageName": "doc.text.magnifyingglass",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 30,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.generate-readme",
+      "title": "Generate README",
+      "systemImageName": "book.pages",
+      "defaultCategory": "ai",
+      "supportedContexts": ["folder", "empty", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 40,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.generate-gitignore",
+      "title": "Generate .gitignore",
+      "systemImageName": "nosign",
+      "defaultCategory": "ai",
+      "supportedContexts": ["folder", "empty"],
+      "implementationStatus": "planned",
+      "defaultOrder": 50,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.review-code",
+      "title": "Review Code",
+      "systemImageName": "checkmark.seal.text.page",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file", "folder", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 60,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.refactor-file",
+      "title": "Refactor This File",
+      "systemImageName": "wand.and.stars",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file"],
+      "implementationStatus": "planned",
+      "defaultOrder": 70,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.write-tests",
+      "title": "Write Tests For This",
+      "systemImageName": "testtube.2",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file", "folder"],
+      "implementationStatus": "planned",
+      "defaultOrder": 80,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.explain-error",
+      "title": "Explain Error Log",
+      "systemImageName": "exclamationmark.bubble",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file"],
+      "implementationStatus": "planned",
+      "defaultOrder": 90,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.json-schema",
+      "title": "Convert to JSON Schema",
+      "systemImageName": "curlybraces.square",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file"],
+      "implementationStatus": "planned",
+      "defaultOrder": 100,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.commit-message",
+      "title": "Draft Commit Message",
+      "systemImageName": "text.redaction",
+      "defaultCategory": "ai",
+      "supportedContexts": ["folder", "empty", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 110,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.pr-summary",
+      "title": "Draft PR Summary",
+      "systemImageName": "rectangle.and.pencil.and.ellipsis",
+      "defaultCategory": "ai",
+      "supportedContexts": ["folder", "empty", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 120,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.summarize-selection",
+      "title": "AI Summarize Selection",
+      "systemImageName": "sparkles.rectangle.stack",
+      "defaultCategory": "ai",
+      "supportedContexts": ["multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 130,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.ask-selection",
+      "title": "AI Ask About Selection",
+      "systemImageName": "questionmark.bubble",
+      "defaultCategory": "ai",
+      "supportedContexts": ["multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 140,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "ai.repeat-last",
+      "title": "Repeat Last AI Action",
+      "systemImageName": "arrow.clockwise.circle",
+      "defaultCategory": "ai",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 150,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresAI": true
+      }
+    },
+    {
+      "id": "submenu.scripts",
+      "title": "Scripts",
+      "systemImageName": "terminal",
+      "defaultCategory": "scripts",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "beta",
+      "defaultOrder": 0,
+      "defaultVisible": true,
+      "childrenPolicy": "scripts",
+      "requirements": {}
+    },
+    {
+      "id": "view.toggle-hidden",
+      "title": "Show Hidden Files Here",
+      "systemImageName": "eye.slash",
+      "defaultCategory": "view",
+      "supportedContexts": ["file", "folder", "empty"],
+      "implementationStatus": "beta",
+      "defaultOrder": 10,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {
+        "requiresDirectoryContext": true
+      }
+    },
+    {
+      "id": "view.refresh",
+      "title": "Refresh Finder Window",
+      "systemImageName": "arrow.clockwise",
+      "defaultCategory": "view",
+      "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+      "implementationStatus": "beta",
+      "defaultOrder": 20,
+      "defaultVisible": true,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "folder.search",
+      "title": "Search in Folder",
+      "systemImageName": "magnifyingglass",
+      "defaultCategory": "view",
+      "supportedContexts": ["folder", "empty"],
+      "implementationStatus": "planned",
+      "defaultOrder": 30,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "folder.size",
+      "title": "Folder Size",
+      "systemImageName": "internaldrive",
+      "defaultCategory": "view",
+      "supportedContexts": ["folder", "empty"],
+      "implementationStatus": "planned",
+      "defaultOrder": 40,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "folder.count",
+      "title": "Count Items",
+      "systemImageName": "number",
+      "defaultCategory": "view",
+      "supportedContexts": ["folder", "empty"],
+      "implementationStatus": "planned",
+      "defaultOrder": 50,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {}
+    },
+    {
+      "id": "multi.batch-rename",
+      "title": "Batch Rename",
+      "systemImageName": "character.cursor.ibeam",
+      "defaultCategory": "fileOps",
+      "supportedContexts": ["multi"],
+      "implementationStatus": "planned",
+      "defaultOrder": 60,
+      "defaultVisible": false,
+      "childrenPolicy": "none",
+      "requirements": {}
+    }
+  ]
+}

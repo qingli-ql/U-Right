@@ -1,0 +1,196 @@
+{
+  "name": "legacy-flat-only-v2",
+  "sourceVersion": 2,
+  "expectedDocumentVersion": 3,
+  "forbiddenTopLevelKeys": [
+    "launchAtLogin",
+    "showMenuBarIcon",
+    "showExtensionStatus",
+    "defaultTerminal",
+    "defaultEditor",
+    "aiEnabled",
+    "preferredAIProvider",
+    "apiBaseURL",
+    "apiKey",
+    "apiModel",
+    "systemPromptTemplate",
+    "maxContextFileSize",
+    "maxFolderScanDepth",
+    "includeHiddenFiles",
+    "customTemplateFolder",
+    "debugLogging",
+    "customExecutablePaths",
+    "toolPreferences",
+    "aiActionVisibility"
+  ],
+  "requiredPaths": [
+    "pinnedActionIDs",
+    "recentActionIDs",
+    "lastAIActionID",
+    "contextMenu.categorySettings",
+    "contextMenu.actionSettings",
+    "contextMenu.collapseSingleActionGroups",
+    "contextMenu.showUnavailableInPreview",
+    "general.launchAtLogin",
+    "general.showMenuBarIcon",
+    "general.showExtensionStatus",
+    "integrations.defaultTerminal",
+    "integrations.defaultEditor",
+    "integrations.toolPreferences",
+    "integrations.customExecutablePaths",
+    "templates.customTemplateFolder",
+    "templates.userTemplates",
+    "templates.extensionDefaults",
+    "templates.hiddenBuiltInTemplateIDs",
+    "ai.enabled",
+    "ai.preferredProvider",
+    "ai.profiles",
+    "ai.promptPolicies",
+    "ai.actionVisibility",
+    "customActions.openActions",
+    "advanced.debugLogging"
+  ],
+  "expectedValues": {
+    "general.launchAtLogin": true,
+    "general.showMenuBarIcon": false,
+    "general.showExtensionStatus": false,
+    "integrations.defaultTerminal": "ghostty",
+    "integrations.defaultEditor": "cursor",
+    "integrations.customExecutablePaths.ghostty": "/Applications/Ghostty.app",
+    "templates.customTemplateFolder": "/Users/example/Templates",
+    "ai.enabled": false,
+    "ai.preferredProvider": "openAICompatible",
+    "ai.actionVisibility.0": "ai.ask-codex",
+    "advanced.debugLogging": true,
+    "contextMenu.collapseSingleActionGroups": false,
+    "contextMenu.showUnavailableInPreview": true,
+    "pinnedActionIDs.0": "open.terminal",
+    "recentActionIDs.0": "copy.path",
+    "lastAIActionID": "ai.ask-codex"
+  },
+  "legacySettings": {
+    "launchAtLogin": true,
+    "showMenuBarIcon": false,
+    "showExtensionStatus": false,
+    "defaultTerminal": "ghostty",
+    "defaultEditor": "cursor",
+    "aiEnabled": false,
+    "preferredAIProvider": "openAICompatible",
+    "apiBaseURL": "https://example.invalid/v1",
+    "apiKey": "sk-test",
+    "apiModel": "gpt-test",
+    "systemPromptTemplate": "Legacy prompt",
+    "maxContextFileSize": 12345,
+    "maxFolderScanDepth": 5,
+    "includeHiddenFiles": true,
+    "customTemplateFolder": "/Users/example/Templates",
+    "debugLogging": true,
+    "customExecutablePaths": {
+      "ghostty": "/Applications/Ghostty.app"
+    },
+    "toolPreferences": [
+      {
+        "kind": "ghostty",
+        "customPath": "/Applications/Ghostty.app",
+        "allowMenuActions": true
+      }
+    ],
+    "aiActionVisibility": [
+      "ai.ask-codex"
+    ],
+    "pinnedActionIDs": [
+      "open.terminal"
+    ],
+    "recentActionIDs": [
+      "copy.path"
+    ],
+    "lastAIActionID": "ai.ask-codex",
+    "contextMenu": {
+      "categorySettings": [],
+      "actionSettings": [],
+      "collapseSingleActionGroups": false,
+      "showUnavailableInPreview": true
+    },
+    "customActions": {
+      "openActions": []
+    }
+  },
+  "sampleMigratedSettings": {
+    "pinnedActionIDs": [
+      "open.terminal"
+    ],
+    "recentActionIDs": [
+      "copy.path"
+    ],
+    "lastAIActionID": "ai.ask-codex",
+    "contextMenu": {
+      "categorySettings": [],
+      "actionSettings": [],
+      "collapseSingleActionGroups": false,
+      "showUnavailableInPreview": true
+    },
+    "general": {
+      "launchAtLogin": true,
+      "showMenuBarIcon": false,
+      "showExtensionStatus": false
+    },
+    "integrations": {
+      "defaultTerminal": "ghostty",
+      "defaultEditor": "cursor",
+      "toolPreferences": [
+        {
+          "kind": "ghostty",
+          "customPath": "/Applications/Ghostty.app",
+          "allowMenuActions": true
+        }
+      ],
+      "customExecutablePaths": {
+        "ghostty": "/Applications/Ghostty.app"
+      }
+    },
+    "templates": {
+      "customTemplateFolder": "/Users/example/Templates",
+      "userTemplates": [],
+      "extensionDefaults": [],
+      "hiddenBuiltInTemplateIDs": [
+        "css"
+      ]
+    },
+    "ai": {
+      "enabled": false,
+      "preferredProvider": "openAICompatible",
+      "profiles": [
+        {
+          "id": "migrated-profile",
+          "name": "Migrated Legacy Profile",
+          "provider": "openAICompatible",
+          "apiBaseURL": "https://example.invalid/v1",
+          "apiKey": "sk-test",
+          "apiModel": "gpt-test",
+          "isEnabled": true
+        }
+      ],
+      "defaultProfileID": "migrated-profile",
+      "promptPolicies": [
+        {
+          "id": "migrated-policy",
+          "name": "Migrated Legacy Prompt",
+          "systemPromptTemplate": "Legacy prompt",
+          "maxContextFileSize": 12345,
+          "maxFolderScanDepth": 5,
+          "includeHiddenFiles": true
+        }
+      ],
+      "defaultPromptPolicyID": "migrated-policy",
+      "actionVisibility": [
+        "ai.ask-codex"
+      ]
+    },
+    "customActions": {
+      "openActions": []
+    },
+    "advanced": {
+      "debugLogging": true
+    }
+  }
+}

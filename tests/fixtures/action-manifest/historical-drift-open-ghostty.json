@@ -1,0 +1,45 @@
+{
+  "expectedActions": [
+    {
+      "id": "open.ghostty",
+      "ts": {
+        "id": "open.ghostty",
+        "title": "Open in Ghostty",
+        "systemImageName": "terminal",
+        "defaultCategory": "open",
+        "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+        "implementationStatus": "implemented",
+        "defaultOrder": 40,
+        "defaultVisible": true,
+        "childrenPolicy": "none",
+        "requiredTool": "ghostty",
+        "requiresAI": false,
+        "requiresWritableTarget": false,
+        "requiresSingleSelection": false,
+        "requiresDirectoryContext": false,
+        "isDestructive": false,
+        "needsConfirmation": false
+      },
+      "swift": {
+        "id": "open.ghostty",
+        "title": "Open in Ghostty",
+        "systemImageName": "terminal",
+        "defaultCategory": "open",
+        "supportedContexts": ["file", "folder", "mixed", "empty", "multi"],
+        "implementationStatus": "implemented",
+        "defaultOrder": 40,
+        "defaultVisible": true,
+        "childrenPolicy": "none",
+        "requirements": {
+          "requiredTool": "ghostty",
+          "requiresAI": false,
+          "requiresWritableTarget": false,
+          "requiresSingleSelection": false,
+          "requiresDirectoryContext": false,
+          "isDestructive": false,
+          "needsConfirmation": false
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,268 @@
+{
+  "actionSettings": [
+    {
+      "actionID": "create.new-file",
+      "isEnabled": true,
+      "category": "create",
+      "order": 0
+    },
+    {
+      "actionID": "create.new-folder",
+      "isEnabled": true,
+      "category": "create",
+      "order": 10
+    },
+    {
+      "actionID": "submenu.templates",
+      "isEnabled": true,
+      "category": "create",
+      "order": 20
+    },
+    {
+      "actionID": "open.terminal",
+      "isEnabled": true,
+      "category": "open",
+      "order": 0
+    },
+    {
+      "actionID": "open.vscode",
+      "isEnabled": true,
+      "category": "open",
+      "order": 10
+    },
+    {
+      "actionID": "open.cursor",
+      "isEnabled": true,
+      "category": "open",
+      "order": 20
+    },
+    {
+      "actionID": "open.zed",
+      "isEnabled": true,
+      "category": "open",
+      "order": 30
+    },
+    {
+      "actionID": "open.ghostty",
+      "isEnabled": true,
+      "category": "open",
+      "order": 40
+    },
+    {
+      "actionID": "copy.path",
+      "isEnabled": true,
+      "category": "clipboard",
+      "order": 0
+    },
+    {
+      "actionID": "copy.relative-path",
+      "isEnabled": true,
+      "category": "clipboard",
+      "order": 10
+    },
+    {
+      "actionID": "copy.filename",
+      "isEnabled": true,
+      "category": "clipboard",
+      "order": 20
+    },
+    {
+      "actionID": "copy.basename",
+      "isEnabled": true,
+      "category": "clipboard",
+      "order": 30
+    },
+    {
+      "actionID": "copy.extension",
+      "isEnabled": true,
+      "category": "clipboard",
+      "order": 40
+    },
+    {
+      "actionID": "finder.reveal",
+      "isEnabled": true,
+      "category": "view",
+      "order": 0
+    },
+    {
+      "actionID": "file.rename",
+      "isEnabled": true,
+      "category": "fileOps",
+      "order": 0
+    },
+    {
+      "actionID": "file.trash",
+      "isEnabled": true,
+      "category": "fileOps",
+      "order": 10
+    },
+    {
+      "actionID": "file.duplicate",
+      "isEnabled": true,
+      "category": "fileOps",
+      "order": 20
+    },
+    {
+      "actionID": "file.compress",
+      "isEnabled": true,
+      "category": "fileOps",
+      "order": 30
+    },
+    {
+      "actionID": "file.json-format",
+      "isEnabled": true,
+      "category": "fileOps",
+      "order": 40
+    },
+    {
+      "actionID": "file.toggle-executable",
+      "isEnabled": true,
+      "category": "fileOps",
+      "order": 50
+    },
+    {
+      "actionID": "git.status",
+      "isEnabled": true,
+      "category": "git",
+      "order": 0
+    },
+    {
+      "actionID": "ai.ask-claude",
+      "isEnabled": true,
+      "category": "ai",
+      "order": 0
+    },
+    {
+      "actionID": "ai.ask-codex",
+      "isEnabled": true,
+      "category": "ai",
+      "order": 10
+    },
+    {
+      "actionID": "ai.explain-project",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 20
+    },
+    {
+      "actionID": "ai.summarize-files",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 30
+    },
+    {
+      "actionID": "ai.generate-readme",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 40
+    },
+    {
+      "actionID": "ai.generate-gitignore",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 50
+    },
+    {
+      "actionID": "ai.review-code",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 60
+    },
+    {
+      "actionID": "ai.refactor-file",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 70
+    },
+    {
+      "actionID": "ai.write-tests",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 80
+    },
+    {
+      "actionID": "ai.explain-error",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 90
+    },
+    {
+      "actionID": "ai.json-schema",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 100
+    },
+    {
+      "actionID": "ai.commit-message",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 110
+    },
+    {
+      "actionID": "ai.pr-summary",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 120
+    },
+    {
+      "actionID": "ai.summarize-selection",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 130
+    },
+    {
+      "actionID": "ai.ask-selection",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 140
+    },
+    {
+      "actionID": "ai.repeat-last",
+      "isEnabled": false,
+      "category": "ai",
+      "order": 150
+    },
+    {
+      "actionID": "submenu.scripts",
+      "isEnabled": true,
+      "category": "scripts",
+      "order": 0
+    },
+    {
+      "actionID": "view.toggle-hidden",
+      "isEnabled": true,
+      "category": "view",
+      "order": 10
+    },
+    {
+      "actionID": "view.refresh",
+      "isEnabled": true,
+      "category": "view",
+      "order": 20
+    },
+    {
+      "actionID": "folder.search",
+      "isEnabled": false,
+      "category": "view",
+      "order": 30
+    },
+    {
+      "actionID": "folder.size",
+      "isEnabled": false,
+      "category": "view",
+      "order": 40
+    },
+    {
+      "actionID": "folder.count",
+      "isEnabled": false,
+      "category": "view",
+      "order": 50
+    },
+    {
+      "actionID": "multi.batch-rename",
+      "isEnabled": false,
+      "category": "fileOps",
+      "order": 60
+    }
+  ]
+}

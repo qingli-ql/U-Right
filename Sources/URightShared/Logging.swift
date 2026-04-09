@@ -24,13 +24,14 @@ public final class Logger: @unchecked Sendable {
     }
 
     public func debug(_ subsystem: String, _ message: String) {
-        if SettingsStore.shared.load().debugLogging {
+        if SettingsStore.shared.load().advanced.debugLogging {
             write(level: "DEBUG", subsystem: subsystem, message: message)
         }
     }
 
     private func write(level: String, subsystem: String, message: String) {
-        let safeMessage = message.replacingOccurrences(of: SettingsStore.shared.load().apiKey, with: "***")
+        let apiKey = SettingsStore.shared.load().activeAIProfile?.apiKey ?? ""
+        let safeMessage = apiKey.isEmpty ? message : message.replacingOccurrences(of: apiKey, with: "***")
         let line = "\(dateFormatter.string(from: .now)) [\(level)] [\(subsystem)] \(safeMessage)\n"
         let writeBlock = {
             let url = SharedPaths.logFileURL()

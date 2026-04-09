@@ -1,0 +1,49 @@
+{
+  "actionID": "open.vscode",
+  "context": {
+    "capabilities": {
+      "hasWorkingDirectory": true,
+      "hasWritableTarget": true,
+      "scriptNames": [
+        "format-json.sh",
+        "quick-open.command"
+      ]
+    },
+    "currentDirectoryURL": "/Users/example/Projects/U Right 示例",
+    "detectedTools": {
+      "codex": {
+        "appPath": null,
+        "executablePath": null,
+        "isInstalled": false,
+        "kind": "codex"
+      },
+      "vscode": {
+        "appPath": null,
+        "executablePath": "/Applications/Visual Studio Code.app",
+        "isInstalled": true,
+        "kind": "vscode"
+      }
+    },
+    "extensionWindowTitle": "U-Right",
+    "fileMetadata": [
+      {
+        "fileExtension": "",
+        "fileSize": null,
+        "isDirectory": true,
+        "isScriptLike": false,
+        "url": "/Users/example/Projects/U Right 示例/含 空格",
+        "uti": "public.folder"
+      }
+    ],
+    "primaryURL": "/Users/example/Projects/U Right 示例/含 空格",
+    "resolvedPrimaryTarget": "/Users/example/Projects/U Right 示例/含 空格",
+    "resolvedSelectionDirectory": "/Users/example/Projects/U Right 示例",
+    "resolvedTargetDirectory": "/Users/example/Projects/U Right 示例/含 空格",
+    "selectedURLs": [
+      "/Users/example/Projects/U Right 示例/含 空格"
+    ],
+    "selectionKind": "folder"
+  },
+  "createdAt": "2024-04-08T00:00:00.123Z",
+  "id": "0B50A5A9-5F72-4E16-B7A3-9B193C2D8E10"
+}

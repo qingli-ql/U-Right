@@ -453,11 +453,18 @@ public struct TemplateSettings: Codable, Hashable, Sendable {
     public var customTemplateFolder: String
     public var userTemplates: [UserTemplateItem]
     public var extensionDefaults: [ExtensionTemplateDefault]
+    public var hiddenBuiltInTemplateIDs: [String]
 
-    public init(customTemplateFolder: String = "", userTemplates: [UserTemplateItem] = [], extensionDefaults: [ExtensionTemplateDefault] = []) {
+    public init(
+        customTemplateFolder: String = "",
+        userTemplates: [UserTemplateItem] = [],
+        extensionDefaults: [ExtensionTemplateDefault] = [],
+        hiddenBuiltInTemplateIDs: [String] = ["css", "javascript", "typescript"]
+    ) {
         self.customTemplateFolder = customTemplateFolder
         self.userTemplates = userTemplates
         self.extensionDefaults = extensionDefaults
+        self.hiddenBuiltInTemplateIDs = hiddenBuiltInTemplateIDs
     }
 }
 

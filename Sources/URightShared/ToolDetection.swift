@@ -11,7 +11,6 @@ public final class ToolDetector: @unchecked Sendable {
         var results: [ToolKind: ToolAvailability] = [:]
         for kind in ToolKind.allCases {
             let customPath = settings.integrations.customExecutablePaths[kind.rawValue].flatMap { $0.isEmpty ? nil : $0 }
-                ?? settings.customExecutablePaths[kind.rawValue]
             let executablePath = customPath?.isEmpty == false ? customPath : executablePath(for: kind)
             let appPath = applicationPath(for: kind)
             let installed = executablePath != nil || appPath != nil
